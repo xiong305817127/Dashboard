@@ -1,7 +1,7 @@
 package com.xh.service.config;
 
 import com.xh.common.exception.WebException;
-import com.xh.dto.ConfigDto;
+import com.xh.entry.Config;
 
 
 public interface ConfigService {
@@ -13,7 +13,7 @@ public interface ConfigService {
 	 * @param value
 	 * @return Config
 	 */
-	public ConfigDto addConfig(String key, String value) throws WebException ;
+	public Config addConfig(String key, String value) throws WebException ;
 
 	/**
 	 * 删除配置
@@ -27,7 +27,7 @@ public interface ConfigService {
 	 * @param key
 	 * @param value
 	 */
-	public ConfigDto updateConfigByKey(String key, String value)  throws WebException ;
+	public Config updateConfigByKey(String key, String value)  throws WebException ;
 
 	/**
 	 * @param key

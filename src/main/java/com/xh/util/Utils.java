@@ -49,8 +49,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,10 +77,16 @@ import com.xh.common.exception.WebException;
  *
  */
 public class Utils {
-	
+
 	protected final static Log logger = LogFactory.getLog(Utils.class);
-	
+
 	private static final int[] ZERO_LENGTH_INT_ARRAY = new int[0];
+
+	public static final String API_PREFIX = "api/v1";
+	
+	
+	public static final Long SSO_TIMEOUT = 30*60*1000L;
+	public static final String SSO_COOKIE_NAME = "sso-token";
 
 	/**
 	 * Copyright year
@@ -241,8 +249,8 @@ public class Utils {
 	 * values are organized from the most to the least significant. see also
 	 * method StringUtil.getFormattedDateTime()
 	 */
-	public static final String GENERALIZED_DATE_TIME_FORMAT = "yyyyddMM_hhmmss";
-	public static final String GENERALIZED_DATE_TIME_FORMAT_MILLIS = "yyyyddMM_hhmmssSSS";
+	public static final String GENERALIZED_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String GENERALIZED_DATE_TIME_FORMAT_MILLIS = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	/**
 	 * Default we store our information in Unicode UTF-8 character set.
@@ -380,8 +388,12 @@ public class Utils {
 		return list == null || list.size() == 0;
 	}
 	
+	public static boolean isNull(Object val) {
+		return val == null || ( val instanceof String && ( (String)val ).length() == 0)||  ( val instanceof List && ( (List)val).size() == 0)||  ( val instanceof Map && ( (Map)val).size() == 0);
+	}
+
 	public static String encode(String string) {
-		if(string == null || string.length() == 0)
+		if (string == null || string.length() == 0)
 			return string;
 		try {
 			String tmp = URLEncoder.encode(string, ENCODING);
@@ -391,9 +403,9 @@ public class Utils {
 			return string;
 		}
 	}
-	
+
 	public static String decode(String string) {
-		if(string == null || string.length() == 0)
+		if (string == null || string.length() == 0)
 			return string;
 		try {
 			return URLDecoder.decode(string, ENCODING);
@@ -402,8 +414,7 @@ public class Utils {
 			return string;
 		}
 	}
-	
-	
+
 	public static String getUrlPath(String incomingURL) {
 		if (Utils.isEmpty(incomingURL)) {
 			return "";
@@ -600,12 +611,20 @@ public class Utils {
 	 * @return The converted value or the default.
 	 */
 	public static Date toDate(String str, Date def) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS", Locale.US);
+		SimpleDateFormat df = new SimpleDateFormat(GENERALIZED_DATE_TIME_FORMAT_MILLIS, Locale.CHINA);
 		try {
 			return df.parse(str);
 		} catch (ParseException e) {
 			return def;
 		}
+	}
+	
+	public static String dateToStr(Date currentDate) {
+		if( isNull(currentDate) ){
+			currentDate = new Date();
+		}
+		SimpleDateFormat df = new SimpleDateFormat(GENERALIZED_DATE_TIME_FORMAT_MILLIS, Locale.CHINA);
+		return df.format(currentDate);
 	}
 
 	/**
@@ -2414,15 +2433,74 @@ public class Utils {
 		return " (Deprecated)";
 	}
 
+	public static <E> ArrayList<E> newArrayList() {
+		return new ArrayList();// 80
+	}
+	
+	public static <E> ArrayList<E> newArrayList(E... objs)  {
+		return  new ArrayList(Arrays.asList(objs));// 80
+	}
+	
+
+	public static <K, V> HashMap<K, V> newHashMap() {
+		return new HashMap<K, V>();
+	}
+	
+	/**
+	 * 字符串匹配 ,
+	 * @param source
+	 * @param pattern
+	 * @return 匹配的组数 ,0 为不匹配,大于0匹配到的组数
+	 */
+	public static boolean stringMatcher( String source ,String pattern){
+		
+		Pattern p=Pattern.compile(pattern); 
+		Matcher m=p.matcher(source); 
+		return m.matches();
+	}
+	
+	/**
+	 * 字符串匹配 ,
+	 * @param source
+	 * @param pattern
+	 * @return 匹配的组数 ,0 为不匹配,大于0匹配到的组数
+	 */
+	public static int stringMatcherGroupCount( String source ,String pattern){
+		
+		Pattern p=Pattern.compile(pattern); 
+		Matcher m=p.matcher(source); 
+		m.find(); 
+		return m.groupCount(); 
+	}
+
+	/**
+	 *  提取字符串匹配的子字符串
+	 * @param source
+	 * @param pattern
+	 * @param groupNum,组数,从1开始,使用 stringMatcherGroupCount获取最大组数
+	 * @return 对应组的子字符串
+	 */
+	public static String stringMatcher( String source ,String pattern,int groupNum){
+		
+		Pattern p=Pattern.compile(pattern); 
+		Matcher m=p.matcher(source); 
+		m.find();
+		if( m.groupCount() >= groupNum ){
+			return m.group(groupNum);
+		}
+		return null ;
+	}
+	
 	public static String getUUIDAsString() {
 		return getUUID().toString();
 	}
-	
+
 	private static UUIDGenerator ug;
 	private static EthernetAddress eAddr;
+
 	public static UUID getUUID() {
 
-		if (ug==null || eAddr == null) {
+		if (ug == null || eAddr == null) {
 			// Try loading the EthernetAddress library. If this fails, then
 			// fallback
 			// to
@@ -2435,8 +2513,8 @@ public class Utils {
 			 * now. }
 			 */
 			ug = UUIDGenerator.getInstance();
-			boolean nativeInitialized =true;
-			if (nativeInitialized ) {
+			boolean nativeInitialized = true;
+			if (nativeInitialized) {
 				try {
 					com.ccg.net.ethernet.EthernetAddress ea = com.ccg.net.ethernet.EthernetAddress.getPrimaryAdapter();
 					eAddr = new org.safehaus.uuid.EthernetAddress(ea.getBytes());
@@ -2473,12 +2551,40 @@ public class Utils {
 			UUID olduuId = ug.generateTimeBasedUUID(eAddr);
 			if (olduuId == null) {
 				return UUID.getNullUUID();
-			} else{
+			} else {
 				return olduuId;
 			}
 		}
 
 		return ug.generateTimeBasedUUID(eAddr);
 	}
+	
+	public static <T> List<T> transListToList(List<?> sources, DtoTransData<T> dtd) throws Exception {
+		if (sources == null || sources.size() == 0) {
+			return Utils.newArrayList();
+		}
+		List<T> result = Utils.newArrayList();
+		for (int i = 0; i < sources.size(); i++) {
+			result.add(dtd.dealData(sources.get(i), i));
+		}
+		return result;
+	}
+	
+	public static <T> List<T> transArrayToList(Object[] sources,DtoTransData<T> dtd) throws Exception{
+		if(sources ==null || sources.length ==0){
+			return Utils.newArrayList();
+		}
+		List<T> result=Utils.newArrayList();
+		for(int i=0;i<sources.length;i++){
+			result.add( dtd.dealData( sources[i],i));
+		}
+		return result;
+	}
 
+	public interface DtoTransData<T> {
+
+		T dealData(Object obj, int index) throws Exception ;
+
+	}
+	
 }

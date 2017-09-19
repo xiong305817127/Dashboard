@@ -59,7 +59,7 @@ public class CloudServiceAspect {
 		StringBuilder log = new StringBuilder("");
 		for (Object arg : args) {
 			if(arg!=null ){
-				log.append(((arg instanceof CommonDto)?JSONObject.fromObject(arg).toString():arg )+ " ,");
+				log.append(((arg instanceof  CommonDto)?JSONObject.fromObject(arg).toString():arg )+ " ,");
 			}else{
 				log.append(arg+ " ,");
 			}
@@ -88,7 +88,7 @@ public class CloudServiceAspect {
 		if( object instanceof ReturnCodeDto || object instanceof HttpEntity){
 			return object;
 		}else{
-			return  new ReturnCodeDto(0,object);
+			return  new ReturnCodeDto(true,object);
 		}
 	}
 	

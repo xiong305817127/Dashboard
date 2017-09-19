@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.xh.common.service.BaseService;
 import com.xh.dao.datasource1.ConfigDao;
-import com.xh.dto.ConfigDto;
 import com.xh.entry.Config;
 
 /**
@@ -33,13 +32,13 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 * @param value
 	 * @return Config
 	 */
-	public ConfigDto addConfig(String key, String value) {
+	public Config addConfig(String key, String value) {
 		Config config = new Config();
 		config.setKey(key);
 		config.setValue(value);
 		config.setCreateTime(new Date());
 		configDao.addConfig(config);
-		return new ConfigDto(config);
+		return config;
 	}
 
 	/**
@@ -58,7 +57,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 * @param key
 	 * @param value
 	 */
-	public ConfigDto updateConfigByKey(String key, String value) {
+	public Config updateConfigByKey(String key, String value) {
 		Config config = configDao.getConfigByKey(key);
 		config.setValue(value);
 		configDao.updateConfig(config);
@@ -66,7 +65,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 		config2.setValue(value);
 		configDao.updateConfig(config2);
 		this.getStringByKey(key);
-		return new ConfigDto(config);
+		return config;
 	}
 
 	/**

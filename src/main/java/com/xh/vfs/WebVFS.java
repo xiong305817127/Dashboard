@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Comparator;
 import java.util.Properties;
 import java.util.Set;
@@ -199,7 +200,47 @@ public class WebVFS {
 		}
 		return fsOptions;
 	}
+	
+	public static void writerTextFileContent(String vfsFilename,String content,String charSetName) throws Exception {
+		saveTextFileContent(vfsFilename, null, false, content, charSetName);
+	}
 
+	public static void appendTextFileContent(String vfsFilename,String content,String charSetName) throws Exception {
+		saveTextFileContent(vfsFilename, null, true, content, charSetName);
+	}
+	
+	public static void saveTextFileContent(String vfsFilename, Boolean append ,String content,String charSetName) throws Exception {
+		saveTextFileContent(vfsFilename, null, append, content, charSetName);
+	}
+	
+	public static void saveTextFileContent(String vfsFilename, Properties space, Boolean append ,String content,String charSetName) throws Exception {
+		OutputStreamWriter writer =null;
+		OutputStream outputStream = null;
+		try {
+			if (space == null) {
+				outputStream = getOutputStream(vfsFilename, append);
+			} else {
+				outputStream = getOutputStream(vfsFilename, space, append);
+			}
+			writer = new OutputStreamWriter(outputStream, charSetName);
+			if(append){
+				writer.append(content);
+			}else{
+				writer.write(content);
+			}
+			writer.flush();
+		} catch (IOException e) {
+			throw new WebException(e);
+		}finally{
+			if( writer != null ){
+				writer.close();
+			}
+			if( outputStream != null ){
+				outputStream.close();
+			}
+		}
+	}
+	
 	/**
 	 * Read a text file (like an XML document). WARNING DO NOT USE FOR DATA
 	 * FILES.
@@ -373,6 +414,13 @@ public class WebVFS {
 	public static String getFriendlyURI(FileObject fileObject) {
 		return fileObject.getName().getFriendlyURI();
 	}
+	
+	public static void createFile(String filename) throws Exception{
+		 FileObject fileObject = getFileObject(filename);
+		 fileObject.createFile();
+		 fileObject.close();
+	}
+	
 
 	public static FileObject createTempFile(String prefix, String suffix, String directory) throws WebException {
 		return createTempFile(prefix, suffix, directory, null);

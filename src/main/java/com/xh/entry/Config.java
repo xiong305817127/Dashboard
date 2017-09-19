@@ -8,6 +8,8 @@ package com.xh.entry;
 
 import java.util.Date;
 
+import com.xh.common.dto.CommonDto;
+
 /**
  * 网站配置实体
  * 
@@ -15,7 +17,7 @@ import java.util.Date;
  * 
  */
 
-public class Config {
+public class Config extends CommonDto {
 
 	/**
 	 * key

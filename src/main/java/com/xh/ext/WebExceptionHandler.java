@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.xh.common.dto.ReturnCodeDto;
 import com.xh.common.exception.WebException;
+import com.xh.entry.User;
+import com.xh.util.Utils;
 
 /**
  * 控制器异常处理切面
@@ -30,8 +33,10 @@ public class WebExceptionHandler {
 	protected final Log logger = LogFactory.getLog(getClass());
 	
 	@InitBinder  
-	public void initBinder(WebDataBinder binder) {  
-		//TODO init
+	public void initBinder(WebDataBinder binder,@SessionAttribute() Object user) throws WebException {  
+		if(Utils.isNull(user)){
+			throw new WebException( "Not Login" );
+		}
 	}
 
 	/**
@@ -41,9 +46,7 @@ public class WebExceptionHandler {
 	 */
 	@ExceptionHandler(WebException.class)
 	public @ResponseBody  ReturnCodeDto webExceptionHandler(HttpServletRequest request,WebException e) {
-		ReturnCodeDto returnDto = new ReturnCodeDto();
-		returnDto.setCode(-1);
-		returnDto.setMessage(e.getMessage());
+		ReturnCodeDto returnDto = new ReturnCodeDto(false,e.getMessage());
 		logger.debug(" Request URI: " + request.getRequestURI());
 		logger.info("异常响应：" + returnDto.toString());
 		return returnDto;
@@ -58,9 +61,7 @@ public class WebExceptionHandler {
 	 */
 	@ExceptionHandler(Exception.class)
 	public  @ResponseBody   ReturnCodeDto exceptionHandler(HttpServletRequest request, Exception e) {
-		ReturnCodeDto returnDto = new ReturnCodeDto();
-		returnDto.setCode(-1);
-		returnDto.setMessage(WebException.getExceptionMessage(e));
+		ReturnCodeDto returnDto = new ReturnCodeDto(false,WebException.getExceptionMessage(e),null);
 		logger.debug(" Request URI: " + request.getRequestURI());
 		logger.info("异常响应：" + returnDto.toString());
 		return returnDto;

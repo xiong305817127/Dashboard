@@ -23,23 +23,22 @@
 	         http://www.springframework.org/schema/task/spring-task.xsd">
 
 	<context:property-placeholder location="classpath*:/config.properties" ignore-resource-not-found="true" ignore-unresolvable="true" />
-		
-	<!-- jdbc 配置 -->	
+
+	<!-- jdbc 配置 -->
 	<import resource="classpath:spring/jdbc.xml" />
-	
+
 	<!-- 自动扫描的包名 -->
 	<context:component-scan base-package="com.xh"></context:component-scan>
 
 	<mvc:annotation-driven />
 
 	<task:annotation-driven />
-	
+
 	<bean class="com.xh.ext.CloudServiceAspect" />
-	
+
 	<bean class="com.xh.ext.SwaggerConfig" />
-	
+
 	<mvc:resources mapping="/swagger/**" location="/swagger/" />
-    <mvc:resources mapping="/images/**" location="/images/" />
-    <mvc:resources mapping="/js/**" location="/js/" />
-	
+	<mvc:resources mapping="/*" location="/frontend/" />
+
 </beans>

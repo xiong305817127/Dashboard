@@ -1,0 +1,44 @@
+[
+    {
+        "id": 0,
+        "username": "admin",
+        "password": "123456",
+        "permissionId": "admin",
+        "male":true,
+        "nickName":"Administrator",
+         "age":25,
+        "avatar":"http://dummyimage.com/100x100/cd79f2/757575.png&text=A",
+        "phone":"18612345678",
+        "email":"12345678@qq.com",
+        "createTime":"2017-09-01 10:15:46.389",
+        "address":"中国  深圳"
+    },
+    {
+        "id": 1,
+        "username": "guest",
+        "password": "guest",
+        "permissionId": "guest",
+         "male":false,
+        "nickName":"Tourist",
+        "age":1,
+        "avatar":"http://dummyimage.com/100x100/f2c879/757575.png&text=G",
+        "phone":"",
+        "email":"",
+        "createTime":"2017-09-10 10:15:46.389",
+        "address":"未知"
+    },
+    {
+        "id": 2,
+        "username": "小明",
+        "password": "123456",
+        "permissionId": "developer",
+         "male":true,
+        "nickName":"xiaoming",
+         "age":28,
+        "avatar":"http://dummyimage.com/100x100/79f2aa/757575.png&text=X",
+        "phone":"19012345678",
+        "email":"12345678@sina.com",
+        "createTime":"2017-09-15 10:15:46.389",
+        "address":"江苏省 徐州市 泉山区"
+    }
+]
