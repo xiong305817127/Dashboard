@@ -67,6 +67,7 @@ const Routers = function ({ history, app }) {
       models: () => [import('./models/post')],
       component: () => import('./routes/post/'),
     },
+   //dynamic add Route,Do not delete
   ]
 
   return (

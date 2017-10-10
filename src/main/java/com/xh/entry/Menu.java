@@ -9,6 +9,8 @@ package com.xh.entry;
 import com.xh.common.dto.CommonDto;
 
 public class Menu  extends CommonDto {
+	
+	private static final long serialVersionUID = 6702897412889447527L;
 
     private String id;
     private String bpid;
@@ -104,6 +106,5 @@ public class Menu  extends CommonDto {
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
 	}
-	
 	
 }

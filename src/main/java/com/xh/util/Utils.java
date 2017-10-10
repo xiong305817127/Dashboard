@@ -1191,6 +1191,49 @@ public class Utils {
 		return str.toString();
 	}
 
+	
+	public static String replMap(String string,Map<String,String> map) {
+		if (string == null) {
+			return null;
+		}
+		StringBuilder str = new StringBuilder(string);
+
+		int idx = str.indexOf("%%");
+		while (idx >= 0) {
+			// OK, so we found a marker, look for the next one...
+			int to = str.indexOf("%%", idx + 2);
+			if (to >= 0) {
+				// OK, we found the other marker also...
+				String marker = str.substring(idx, to + 2);
+				String var = str.substring(idx + 2, to);
+
+				if (var != null && var.length() > 0) {
+					// Get the environment variable
+					String newval =map.get(var);
+
+					if (newval != null) {
+						// Replace the whole bunch
+						str.replace(idx, to + 2, newval);
+						// System.out.println("Replaced ["+marker+"] with
+						// ["+newval+"]");
+
+						// The last position has changed...
+						to += newval.length() - marker.length();
+					}
+				}
+
+			} else {
+				// We found the start, but NOT the ending %% without closing %%
+				to = idx;
+			}
+
+			// Look for the next variable to replace...
+			idx = str.indexOf("%%", to + 1);
+		}
+
+		return str.toString();
+	}
+	
 	/**
 	 * Replaces environment variables in an array of strings.
 	 * <p>

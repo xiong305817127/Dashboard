@@ -15,7 +15,7 @@ const FormItem = Form.Item
 
 const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
   location.query = queryString.parse(location.search)
-  const {  menu ,currentSelectMenu,modalType,showForm,permissions,currentPermissions,checkedPermissions,showAdd } = menusConfig
+  const {  menu ,currentSelectMenu,modalType,showForm,permissions,currentPermissions,checkedPermissions,showAdd,createTemplate } = menusConfig
   const { isAdmin } = app
   const menuTree = arrayToTree(menu.filter(_ => _.mpid !== '-1'), 'id', 'mpid')
 
@@ -72,6 +72,15 @@ const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
         currentSelectMenu:{},
         modalType:"create",
         showForm:true
+      },
+    })
+  }
+
+  const onTemplateChange = (value) =>{
+    dispatch({
+      type: "menusConfig/updateState",
+      payload: {
+        createTemplate:value
       },
     })
   }
@@ -179,8 +188,10 @@ const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
     menu : currentSelectMenu,
     modalType:modalType,
     menuTree:menuTree,
+    createTemplate:createTemplate,
     onOk:onEditOk,
-    onDelete:onDeleteItem
+    onDelete:onDeleteItem,
+    onTemplateChange:onTemplateChange
   }
 
   const tableProps ={

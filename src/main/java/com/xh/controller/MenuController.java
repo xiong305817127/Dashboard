@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xh.common.controller.BaseController;
-import com.xh.common.exception.WebException;
+import com.xh.dto.MenuDto;
 import com.xh.entry.Menu;
 import com.xh.entry.User;
 import com.xh.service.menu.MenuService;
-import com.xh.service.user.UserService;
 import com.xh.util.Utils;
 
 @Controller
@@ -42,7 +42,7 @@ public class MenuController extends BaseController{
 	}
 
 	@RequestMapping(method=RequestMethod.POST,value="/menus")
-	public @ResponseBody Object addMenu(@RequestBody Menu menu ) throws Exception {
+	public @ResponseBody Object addMenu(@RequestBody MenuDto menu ) throws Exception {
 		menuService.addMenu(menu);
 		return menu;
 	}

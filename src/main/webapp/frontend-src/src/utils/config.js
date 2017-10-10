@@ -28,5 +28,6 @@ module.exports = {
     weather: `${APIV1}/weather`,
     v1test: `${APIV1}/test`,
     v2test: `${APIV2}/test`,
+    //dynamic add Api,Do not delete
   },
 }

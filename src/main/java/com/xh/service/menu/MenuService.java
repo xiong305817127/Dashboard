@@ -2,12 +2,13 @@ package com.xh.service.menu;
 
 import java.util.List;
 
+import com.xh.dto.MenuDto;
 import com.xh.entry.Menu;
 
 
 public interface MenuService {
 
-	public void addMenu(Menu menu) throws Exception;
+	public void addMenu(MenuDto menu) throws Exception;
 
 	public Menu deleteMenuByKey(String key) throws Exception;
 

@@ -36,6 +36,15 @@ public class MenuDao {
 		
 	};
 	
+	private final JsonDataSource.KeyFilter<Menu> routeFilter = new JsonDataSource.KeyFilter<Menu>(){
+
+		@Override
+		public boolean findByKey(Menu m,Object key) {
+			return m != null &&isEqual(m.getRoute(), key);
+		}
+		
+	};
+	
 	private final JsonDataSource.KeyFilter<Menu> mpidFilter = new JsonDataSource.KeyFilter<Menu>(){
 
 		@Override
@@ -49,6 +58,14 @@ public class MenuDao {
 		Menu menu = datasource.findRowByKey(tableName, name, nameFilter, t);
 		if( menu == null){
 			throw new WebException(" menu:"+name +"  not exist!");
+		}
+		return menu ;
+	}
+	
+	public Menu getMenuByRoute(String route) throws Exception{
+		Menu menu = datasource.findRowByKey(tableName, route, routeFilter, t);
+		if( menu == null){
+			throw new WebException(" menu route:"+route +"  not exist!");
 		}
 		return menu ;
 	}

@@ -421,6 +421,11 @@ public class WebVFS {
 		 fileObject.close();
 	}
 	
+	public static void createFolder(String filename) throws Exception{
+		 FileObject fileObject = getFileObject(filename);
+		 fileObject.createFolder();
+		 fileObject.close();
+	}
 
 	public static FileObject createTempFile(String prefix, String suffix, String directory) throws WebException {
 		return createTempFile(prefix, suffix, directory, null);

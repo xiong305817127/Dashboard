@@ -47,7 +47,7 @@ public class WebExceptionHandler {
 	@ExceptionHandler(WebException.class)
 	public @ResponseBody  ReturnCodeDto webExceptionHandler(HttpServletRequest request,WebException e) {
 		ReturnCodeDto returnDto = new ReturnCodeDto(false,e.getMessage());
-		logger.debug(" Request URI: " + request.getRequestURI());
+		logger.debug(" Request URI: " + request.getRequestURI(),e);
 		logger.info("异常响应：" + returnDto.toString());
 		return returnDto;
 	}
@@ -62,7 +62,7 @@ public class WebExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public  @ResponseBody   ReturnCodeDto exceptionHandler(HttpServletRequest request, Exception e) {
 		ReturnCodeDto returnDto = new ReturnCodeDto(false,WebException.getExceptionMessage(e),null);
-		logger.debug(" Request URI: " + request.getRequestURI());
+		logger.debug(" Request URI: " + request.getRequestURI(),e);
 		logger.info("异常响应：" + returnDto.toString());
 		return returnDto;
 	}

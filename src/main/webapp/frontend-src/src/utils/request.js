@@ -103,8 +103,8 @@ export default function request (options) {
     })
   }).catch((error) => {
     const  response  = error.response
-    const statusCode = error.statusCode || response.status
-    const message = error.message ||  response.data.message || response.statusText
+    const statusCode = error.statusCode || (response?response.status:501)
+    const message = error.message || ( response?(response.data.message || response.statusText):"unknown error" )
 
     return Promise.reject({ success: false, statusCode, message: message })
   })

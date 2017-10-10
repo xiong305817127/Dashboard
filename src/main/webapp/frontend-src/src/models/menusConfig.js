@@ -22,7 +22,8 @@ export default modelExtend(model, {
     permissions:[],
     currentPermissions:{},
     checkedPermissions:[],
-    showAdd:false
+    showAdd:false,
+    createTemplate:false
   },
 
   subscriptions: {

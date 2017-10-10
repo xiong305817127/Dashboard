@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.xh.common.exception.WebException;
 import com.xh.common.service.BaseService;
 import com.xh.dao.jsondatasource.MenuDao;
+import com.xh.dto.MenuDto;
 import com.xh.entry.Menu;
 import com.xh.util.Utils;
 
@@ -25,10 +26,10 @@ public class MenuServiceImpl extends BaseService implements MenuService{
 	private MenuDao menuDao;
 
 	@Override
-	public void addMenu(Menu menu) throws Exception {
+	public void addMenu(MenuDto menu) throws Exception {
 		
-		if( menu ==null || Utils.isEmpty(menu.getName())){
-			throw new WebException(" menu name cannot be empty !");
+		if( menu ==null || Utils.isEmpty(menu.getName()) ){
+			throw new WebException(" menu cannot be empty !");
 		}
 		Menu oldMenu= null;
 		try{
@@ -37,6 +38,22 @@ public class MenuServiceImpl extends BaseService implements MenuService{
 		}
 		if(oldMenu != null){
 			throw new WebException(" menu "+oldMenu.getName()+" already exists !");
+		}
+		if( !Utils.isEmpty(menu.getRoute()) ){
+			oldMenu= null;
+			try{
+				oldMenu = menuDao.getMenuByRoute(menu.getRoute()) ;
+			}catch(Exception e){
+			}
+			if(oldMenu != null){
+				throw new WebException(" menu Route "+oldMenu.getRoute()+" already exists !");
+			}
+		}
+		if(menu.isCreateTemplate() !=null && menu.isCreateTemplate()){
+			if( Utils.isEmpty(menu.getRoute()) ){
+				throw new WebException(" Create Template ,menu Route cannot be empty  !");
+			}
+			MenuCreateFile.createFile(menu);
 		}
 		
 		menuDao.addMenu(menu);

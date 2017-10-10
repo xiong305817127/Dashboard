@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input, Button, Select,Tag,Popconfirm ,TreeSelect,Icon} from 'antd'
+import { Form, Input, Button, Select,Tag,Popconfirm ,TreeSelect,Icon,Switch} from 'antd'
 import { EnumRoleType } from 'enums'
 import styles from './index.less'
 
@@ -23,7 +23,9 @@ const editMenu = ({
   modalType="update",
   onOk ,
   onDelete,
+  onTemplateChange,
   menuTree,
+  createTemplate,
   form: {
     getFieldDecorator,
     validateFields,
@@ -41,6 +43,10 @@ const editMenu = ({
   const submitForm = (e) => {
      submit(handleOk);
   }
+
+  const  withTemplateChange = (value) =>{
+    onTemplateChange(value) ;
+  }
   const handleOk = () => {
     validateFields((errors) => {
       if (errors) {
@@ -57,7 +63,8 @@ const editMenu = ({
       }
       const data = {
         ...newMenu,
-        id: newid
+        id: newid,
+        createTemplate:createTemplate
       }
       onOk(data)
     })
@@ -127,12 +134,27 @@ const editMenu = ({
           <a  href="https://ant.design/components/icon-cn/" target="_blank" className={styles.iconFind} >查找</a>
 
         </FormItem>
+         { modalType === 'create' &&   <FormItem label="create Template" className={styles.templateForm} hasFeedback  labelCol={{span: 6}} wrapperCol={{ span:14  ,offset:0 }}>
+           {getFieldDecorator('createTemplate', {
+             valuePropName: 'checked',
+             initialValue:createTemplate,
+             rules: [
+               {
+                 required: true,
+               },
+             ],
+           })( <Switch  onChange={withTemplateChange}  key={ "createTemplate"} />  )}
+           {createTemplate && <strong className={styles.tipFont} > &nbsp;&nbsp;&nbsp;you may need to restart the development server</strong>}
+         </FormItem>}
+
          <FormItem label="Route" hasFeedback {...formItemLayout}>
           {getFieldDecorator('route', {
             initialValue: menu.route,
             rules: [
               {
-                required: false,
+                required: createTemplate,
+                pattern: /^\/.*$/,
+                message: 'route must begin with \'/\' !',
               },
             ],
           })(<Input key={ "route"} />)}
@@ -165,9 +187,9 @@ const editMenu = ({
 
          <FormItem  wrapperCol={{ span: 14, offset: 6 }}>
            <div>
-               <Popconfirm title={`Are you sure ${modalType} these items?`}  placement="left" onConfirm={submitForm}>
-                 <Button type="primary" size="large"  className={styles.btn} >{modalType}</Button>
-               </Popconfirm>
+              <Popconfirm title={`Are you sure ${modalType} these items?`}  placement="left" onConfirm={submitForm} >
+               <Button type="primary" size="large"  className={styles.btn} >{modalType}</Button>
+             </Popconfirm>
              { modalType === 'update' &&  <Popconfirm title={`Are you sure delete these items?`}  placement="right" onConfirm={deleteItem}>
                  <Button type="primary" size="large" >Delete</Button>
                </Popconfirm> }
