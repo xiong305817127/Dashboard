@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.xh.xml;
+package com.xh.util.xml;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

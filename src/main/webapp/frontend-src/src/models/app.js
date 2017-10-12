@@ -16,6 +16,7 @@ export default {
   state: {
     user: {},
     isAdmin:false ,
+    isDev:false,
     permissions: {
       visit: [],
     },
@@ -70,7 +71,7 @@ export default {
       const { locationPathname } = yield select(_ => _.app)
       if (success && user) {
         const { data:list } = yield call(menusService.query)
-        const { permissions } = user
+        const { permissions,dev } = user
         let menu = list
         let isAdmin=false
         if (permissions.role === EnumRoleType.ADMIN ) {
@@ -93,6 +94,7 @@ export default {
             permissions,
             menu,
             isAdmin,
+            isDev:dev==="development"
           },
         })
         if (location.pathname === '/login') {

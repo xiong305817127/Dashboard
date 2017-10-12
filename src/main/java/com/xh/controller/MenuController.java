@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xh.common.controller.BaseController;
 import com.xh.dto.MenuDto;
+import com.xh.dto.UserDto;
 import com.xh.entry.Menu;
-import com.xh.entry.User;
 import com.xh.service.menu.MenuService;
 import com.xh.util.Utils;
 
@@ -25,27 +24,38 @@ public class MenuController extends BaseController{
 	MenuService menuService;
 	
 	@RequestMapping(method=RequestMethod.GET,value="/menus")
-	public @ResponseBody Object getUser(@SessionAttribute User user ) throws Exception {
+	public @ResponseBody Object getUser( ) throws Exception {
 
 		return menuService.getMenuList();
 		
 	}
 
 	@RequestMapping(method=RequestMethod.PATCH , value="/menu/{id}")
-	public @ResponseBody Object updateMemu( @PathVariable("id") String id, @RequestBody Menu menu) throws Exception {
+	public @ResponseBody Object updateMemu( @PathVariable("id") String id, @RequestBody Menu menu ,@SessionAttribute UserDto user) throws Exception {
+		
+		isAdmin(user);
+		
 		return menuService.updateMenuByKey(id,menu);
 	}
 
 	@RequestMapping(method=RequestMethod.DELETE, value="/menu/{id}")
-	public @ResponseBody Object deleteMemu( @PathVariable("id") String id) throws Exception {
+	public @ResponseBody Object deleteMemu( @PathVariable("id") String id,@SessionAttribute UserDto user ) throws Exception {
+		isAdmin(user);
+		mustDev(user);
+		
 		return menuService.deleteMenuByKey(id);
 	}
 
 	@RequestMapping(method=RequestMethod.POST,value="/menus")
-	public @ResponseBody Object addMenu(@RequestBody MenuDto menu ) throws Exception {
+	public @ResponseBody Object addMenu(@RequestBody MenuDto menu ,@SessionAttribute UserDto user ) throws Exception {
+		
+		isAdmin(user);
+		mustDev(user);
+		
 		menuService.addMenu(menu);
 		return menu;
 	}
 	
+
 	
 }

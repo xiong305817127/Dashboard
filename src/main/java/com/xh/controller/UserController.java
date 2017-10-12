@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.xh.common.controller.BaseController;
+import com.xh.dto.UserDto;
 import com.xh.entry.User;
 import com.xh.service.user.UserService;
 import com.xh.util.Utils;
@@ -26,7 +27,7 @@ public class UserController extends BaseController{
 	UserService userService;
 	
 	@RequestMapping(method=RequestMethod.GET,value="/user")
-	public @ResponseBody Object getCurrentUser(@SessionAttribute User user ) throws Exception {
+	public @ResponseBody Object getCurrentUser(@SessionAttribute UserDto user ) throws Exception {
 		return user;
 	}
 	
@@ -35,6 +36,11 @@ public class UserController extends BaseController{
 		return userService.addUser(user);
 	}
 
+	@RequestMapping(method=RequestMethod.GET, value="/user/{id}")
+	public @ResponseBody Object getUser( @PathVariable("id") String id) throws Exception {
+		return userService.getUserById(id);
+	}
+	
 	@RequestMapping(method=RequestMethod.PATCH, value="/user/{id}")
 	public @ResponseBody Object updateUser( @PathVariable("id") String id,@RequestBody User user) throws Exception {
 		return userService.updateUserById(id, user);
@@ -45,6 +51,7 @@ public class UserController extends BaseController{
 		return userService.deleteUserById(id);
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method=RequestMethod.DELETE, value="/users")
 	public @ResponseBody Object deleteUsers(@RequestBody Map ids) throws Exception {
 		userService.deleteUserByIds((List)ids.get("ids"));

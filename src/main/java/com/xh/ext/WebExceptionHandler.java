@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.xh.common.dto.ReturnCodeDto;
 import com.xh.common.exception.WebException;
-import com.xh.entry.User;
 import com.xh.util.Utils;
 
 /**

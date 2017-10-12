@@ -483,6 +483,10 @@
 									<replacetoken>/antd/iconfont</replacetoken>
 									<replacevalue>/${project.artifactId}/antd/iconfont</replacevalue>
 								</replace>
+								<replace file="${basedir}/src/main/webapp/frontend/4.3.6/index.css">
+									<replacetoken>4.3.6/static</replacetoken>
+									<replacevalue>static</replacevalue>
+								</replace>
 
 							</target>
 						</configuration>

@@ -4,8 +4,8 @@
 
 > 项目前端和后端需要分开开发(并不是代码分开,而是启动前端服务器和后台服务器,但是他们可以相互访问)
 
-- 后台服务启动: 普通tomcat启动即可(推荐使用eclipse,方便调试部署)
-- 前端服务启动: 修改 .roadhogrc.js 文件中的proxy(前端访问代理, 第23行,主要是端口)为启动的后台服务
+- 后台服务启动: 普通tomcat启动即可(推荐使用eclipse,方便调试部署),需要修改配置文件config.properties 中的 **project.source.path.root** 为当前项目路径.
+- 前端服务启动: 修改 .roadhogrc.js 文件中的proxy(前端访问代理, 第18行,主要是端口)为启动的后台服务
 ```
      "/api/v1": {
        "target": "http://127.0.0.1:9090/Dashboard",
@@ -52,15 +52,11 @@
 
 >> 4. 服务在service包下,所有的服务都必须要继承 com.xh.common.service.BaseService 基础服务. 现有和前端配合的 登录/菜单/用户/权限 四个服务及其接口
 
->> 5. 工具类在util包下,现有base64加密工具,config属性文件读取工具,接口代理工具,类反射工具,字符串/集合/常量等综合工具Util类
+>> 5. 工具类在util包下,现有base64加密工具;config属性文件读取工具;接口代理工具;类反射工具;字符串/集合/常量综合工具Util类;文件工具类在vfs子包下,com.xh.vfs.WebVFS类可以处理本地文件和远程文件(带协议头);xml工具类在xml包下,com.xh.xml.XMLHandler类可以处理xml文件或字符串,并对dom解析;httpUtil工具等
 
->> 6. 文件工具类在vfs包下,com.xh.vfs.WebVFS类可以处理本地文件和远程文件(带协议头)
+>> 6. 公共类在common包下,里面包含控制器,服务等所有公共基类
 
->> 7. xml工具类在xml包下,com.xh.xml.XMLHandler类可以处理xml文件或字符串,并对dom解析
-
->> 8. 公共类在common包下,里面包含控制器,服务等所有公共基类
-
->> 9. 扩展类在ext包下,里面包含swagger配置类,异常处理类,过滤器类,切片类等功能扩展类
+>> 7. 扩展类在ext包下,里面包含swagger配置类,异常处理类,过滤器类,切片类等功能扩展类
 
 
 ## 前端( React Antd )
@@ -216,7 +212,7 @@
 - src/models/XXX 新建路由model
 
 
-    **ps. 简易开发 ,在开发环境,运行npm run dev,在menu管理中增加菜单并自动生成模板,会自动增加路由和相关文件**
+    **ps. 简易开发 ,在开发环境,运行npm run dev,在menu管理中增加菜单并自动生成模板,会自动增加路由和相关文件,只有在开发环境才能使用,后端需要配置project.source.path.root属性**
 
 
 > 发布

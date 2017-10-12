@@ -10,6 +10,11 @@ import com.xh.common.dto.CommonDto;
 
 public class User extends CommonDto{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2039422486623951974L;
+	
 	private String id;
 	private String  username;
 	private String  password;

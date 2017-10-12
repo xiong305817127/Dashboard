@@ -162,6 +162,40 @@ public class ReflectUtils {
 
 		return null;
 	}
+	
+	public static List<Field> seekOsgiFieldList(Object obj, boolean incloudParent ) {
+		
+		if (obj == null) {
+			return null;
+		}
+		Class<?> objClass;
+		if (obj instanceof Class) {
+			objClass = (Class<?>) obj;
+		} else if (obj instanceof String) {
+			try {
+				objClass = Class.forName((String) obj);
+			} catch (ClassNotFoundException e) {
+				logger.info(obj + " not found!");
+				return null;
+			}
+		} else {
+			objClass = obj.getClass();
+		}
+		
+		List<Field> result =Utils.newArrayList();
+		result.addAll( Arrays.asList(objClass.getDeclaredFields()));
+		if(incloudParent){
+			if (objClass.getGenericSuperclass() != null) {
+				// 查找父类
+				List<Field> parentList = seekOsgiFieldList(objClass.getSuperclass(), incloudParent);
+				if(parentList != null && parentList.size() >0){
+					result.addAll(parentList);
+				}
+			}
+		}
+		return result;
+	}
+	
 
 	/**
 	 * Get field declared in class loaded in OSGI bundle.

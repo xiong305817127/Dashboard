@@ -1,14 +1,10 @@
 package com.xh.service.Permission;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.xh.common.dto.PaginationDto;
 import com.xh.common.exception.WebException;
 import com.xh.common.service.BaseService;
 import com.xh.dao.jsondatasource.PermissionDao;
@@ -16,8 +12,6 @@ import com.xh.dao.jsondatasource.UserDao;
 import com.xh.entry.Permission;
 import com.xh.entry.User;
 import com.xh.util.Utils;
-
-import net.sourceforge.pinyin4j.PinyinHelper;
 
 /**
  * 网站配置

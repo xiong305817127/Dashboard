@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.xh.xml;
+package com.xh.util.xml;
 
 import org.w3c.dom.Node;
 

@@ -3,13 +3,12 @@ package com.xh.dao.jsondatasource.jsonDatabase;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.xh.util.Utils;
-import com.xh.vfs.WebVFS;
+import com.xh.util.vfs.WebVFS;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -31,7 +30,6 @@ public class JsonDataSource {
 		return list.stream().sorted(comparator).collect(Collectors.toList());
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> int getMaxId(String tableName) throws Exception{
 		
 		JSONArray jsonList = getTableFile(tableName);
@@ -102,7 +100,7 @@ public class JsonDataSource {
 		
 	}
 	
-	private   JSONArray  getTableFile(String tableName) throws  Exception{
+	public   JSONArray  getTableFile(String tableName) throws  Exception{
 		
 		String fileName = JsonDataSource.class.getClassLoader().getResource("").getPath()+"/"+JsonDataSource.class.getPackage().getName().replaceAll("\\.", "/")+"/"+tableName+".json";
 		if( !WebVFS.fileExists(fileName)){

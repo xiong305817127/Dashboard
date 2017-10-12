@@ -9,12 +9,15 @@ const FormItem = Form.Item
 
 const Login = ({
   loading,
+  login,
   dispatch,
   form: {
     getFieldDecorator,
     validateFieldsAndScroll,
   },
 }) => {
+
+  const { showPassword } = login
   function handleOk () {
     validateFieldsAndScroll((errors, values) => {
       if (errors) {
@@ -22,6 +25,14 @@ const Login = ({
       }
       dispatch({ type: 'login/login', payload: values })
     })
+  }
+
+  const onShowPassword1 = (e) =>{
+    dispatch({ type: 'login/updateState', payload: {showPassword : 1} })
+  }
+
+  const onShowPassword2 = (e) =>{
+    dispatch({ type: 'login/updateState', payload: {showPassword : 2} })
   }
 
   return (
@@ -57,6 +68,14 @@ const Login = ({
             <span>Username：guest</span>
             <span>Password：guest</span>
           </p>
+          <p>
+            <span>Username：dev-xh</span>
+            <span onDoubleClick={onShowPassword2} >Password：{ showPassword==2 ?"123456":"******" }</span>
+          </p>
+          <p>
+            <span>Username：admin</span>
+            <span onDoubleClick={onShowPassword1} >Password：{ showPassword==1 ?"123456":"******" }</span>
+          </p>
         </Row>
 
       </form>
@@ -68,6 +87,7 @@ Login.propTypes = {
   form: PropTypes.object,
   dispatch: PropTypes.func,
   loading: PropTypes.object,
+  login: PropTypes.object,
 }
 
-export default connect(({ loading }) => ({ loading }))(Form.create()(Login))
+export default connect(({ login , loading }) => ({ login, loading }))(Form.create()(Login))

@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.xh.common.service.BaseService;
+import com.xh.dto.UserDto;
 import com.xh.entry.User;
 import com.xh.service.user.UserService;
 
@@ -21,11 +22,11 @@ public class LoginServiceImpl extends BaseService implements LoginService{
 	private UserService userService;
 
 	@Override
-	public User login(User userOld) throws Exception {
+	public UserDto login(UserDto userOld) throws Exception {
 		
 		 User userNew = userService.getUserByUserName(userOld.getUsername());
 		 if(userOld.getPassword().equals(userNew.getPassword())){
-			 return userNew;
+			 return (UserDto)updateObjectToBean(userNew, userOld);
 		 }
 		 return null ;
 		

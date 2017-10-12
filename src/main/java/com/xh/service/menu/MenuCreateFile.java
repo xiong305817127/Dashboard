@@ -7,7 +7,7 @@ import com.xh.common.exception.WebException;
 import com.xh.entry.Menu;
 import com.xh.util.ConfigPropertyUtil;
 import com.xh.util.Utils;
-import com.xh.vfs.WebVFS;
+import com.xh.util.vfs.WebVFS;
 
 public class MenuCreateFile {
 
@@ -18,10 +18,15 @@ public class MenuCreateFile {
 
 	public static void createFile(Menu menu) throws Exception {
 
-		String projectRoot = ConfigPropertyUtil.getProperty("project.source.path.root");
-		if (menu == null || Utils.isEmpty(projectRoot)) {
-			throw new WebException(" cannot create menu file ! ");
+		if (menu == null ) {
+			throw new WebException(" menu is null! ");
 		}
+		
+		String projectRoot = ConfigPropertyUtil.getProperty("project.source.path.root");
+		if ( Utils.isEmpty(projectRoot)) {
+			throw new WebException("The project root path (Dashboard path) was not found. Configure the variable 'project.source.path.root' ! ");
+		}
+
 		new MenuCreateFile(projectRoot, menu.getRoute(), menu.getName()).start();
 	}
 
@@ -29,7 +34,7 @@ public class MenuCreateFile {
 	private String menuRoute;
 	private String menuName;
 
-	public MenuCreateFile(String projectRoot, String menuRoute, String menuName) {
+	private MenuCreateFile(String projectRoot, String menuRoute, String menuName) {
 		this.projectRoot = projectRoot;
 		this.menuRoute = menuRoute;
 		this.menuName = menuName;

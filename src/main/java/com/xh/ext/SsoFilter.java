@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xh.common.dto.ReturnCodeDto;
-import com.xh.entry.User;
+import com.xh.dto.UserDto;
 import com.xh.util.Base64Util;
 import com.xh.util.Utils;
 
@@ -72,7 +72,7 @@ public class SsoFilter implements Filter {
 			if (opt.isPresent()) {
 				//更新时间
 				Cookie cookie = opt.get();
-				User user = Base64Util.decodeUser(cookie.getValue());
+				UserDto user = Base64Util.decodeUser(cookie.getValue());
 				request.setAttribute("user", user);
 				session.setAttribute("user", user);
 				

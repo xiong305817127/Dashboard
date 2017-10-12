@@ -14,11 +14,6 @@ export default {
   outputPath: `./dist/${version}`,
   // 接口代理示例
   proxy: {
-    "/api/v1/weather": {
-      "target": "https://api.seniverse.com/",
-      "changeOrigin": true,
-      "pathRewrite": { "^/api/v1/weather": "/v3/weather" }
-    },
      "/api/v1": {
        "target": "http://127.0.0.1:9090/Dashboard",
        "changeOrigin": true,

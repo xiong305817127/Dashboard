@@ -41,18 +41,19 @@ export default modelExtend(model, {
     * query ({
       payload,
     }, { call, put }) {
-      const data = yield call(query, parse(payload))
-      yield put({
-        type: 'updateState',
-        payload: data,
-      })
+      const { success ,data } = yield call(query, parse(payload))
+      if (success) {
+        yield put({
+          type: 'updateState',
+          payload: data,
+        })
+      }
     },
     * queryWeather ({
       payload = {},
     }, { call, put }) {
       payload.location = 'shenzhen'
-      const result = yield call(weatherService.query, payload)
-      const { success } = result
+      const { success ,data:result }  = yield call(weatherService.query, payload)
       if (success) {
         const data = result.results[0]
         const weather = {

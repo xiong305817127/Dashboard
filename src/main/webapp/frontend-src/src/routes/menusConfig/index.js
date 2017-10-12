@@ -16,7 +16,7 @@ const FormItem = Form.Item
 const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
   location.query = queryString.parse(location.search)
   const {  menu ,currentSelectMenu,modalType,showForm,permissions,currentPermissions,checkedPermissions,showAdd,createTemplate } = menusConfig
-  const { isAdmin } = app
+  const { isAdmin ,isDev} = app
   const menuTree = arrayToTree(menu.filter(_ => _.mpid !== '-1'), 'id', 'mpid')
 
   const changeTabs = (key) => {
@@ -189,6 +189,7 @@ const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
     modalType:modalType,
     menuTree:menuTree,
     createTemplate:createTemplate,
+    isDev:isDev,
     onOk:onEditOk,
     onDelete:onDeleteItem,
     onTemplateChange:onTemplateChange
@@ -244,7 +245,7 @@ const Menus = ({ location, dispatch, menusConfig,app, loading }) => {
           </Sider >
           <Content className={styles.content}>
             { showForm  &&  <EditMenu key={currentSelectMenu.name}  {...editMenuProps} /> }
-            { !showForm  &&
+            { (!showForm&&isDev)  &&
             <div>
               <Button  type="primary"  icon="plus" size="large" ghost  className={styles.addIcon} onClick={openCreate} ></Button>
               <div className={styles.addText} >增加菜单</div>

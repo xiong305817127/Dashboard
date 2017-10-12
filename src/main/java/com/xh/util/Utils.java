@@ -388,6 +388,7 @@ public class Utils {
 		return list == null || list.size() == 0;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static boolean isNull(Object val) {
 		return val == null || ( val instanceof String && ( (String)val ).length() == 0)||  ( val instanceof List && ( (List)val).size() == 0)||  ( val instanceof Map && ( (Map)val).size() == 0);
 	}
@@ -2476,10 +2477,12 @@ public class Utils {
 		return " (Deprecated)";
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <E> ArrayList<E> newArrayList() {
 		return new ArrayList();// 80
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <E> ArrayList<E> newArrayList(E... objs)  {
 		return  new ArrayList(Arrays.asList(objs));// 80
 	}
@@ -2487,6 +2490,17 @@ public class Utils {
 
 	public static <K, V> HashMap<K, V> newHashMap() {
 		return new HashMap<K, V>();
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <K, V> HashMap<K, V> newHashMap(Object... obj) {
+		HashMap res = new HashMap<K, V>();
+		if(obj.length%2 == 0 ){
+			for(int i=0 ; i < obj.length ; i=i+2){
+				res.put(obj[i], obj[i+1]);
+			}
+		}
+		return res;
 	}
 	
 	/**

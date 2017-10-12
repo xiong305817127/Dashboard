@@ -20,6 +20,11 @@ import com.xh.common.dto.CommonDto;
 public class Config extends CommonDto {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9189739040993377926L;
+
+	/**
 	 * key
 	 */
 	private String key;

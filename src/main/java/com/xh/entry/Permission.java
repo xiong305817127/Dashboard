@@ -13,7 +13,12 @@ import com.xh.common.dto.CommonDto;
 
 public class Permission extends CommonDto {
 
-    private String id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7243922354200592413L;
+	
+	private String id;
     private List<String> visit;
     private String role;
 	/**

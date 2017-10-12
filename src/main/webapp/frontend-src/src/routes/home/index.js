@@ -23,6 +23,21 @@ function Home ({ home, loading }) {
   return (
     <Page loading={loading.models.home && sales.length === 0}>
       <Row gutter={24}>
+        <Col lg={8} md={24}>
+          <Card bordered={false} {...bodyStyle}>
+            <Browser data={browser} />
+          </Card>
+        </Col>
+        <Col lg={8} md={24}>
+          <Card bordered={false} {...bodyStyle}>
+            <Cpu {...cpu} />
+          </Card>
+        </Col>
+        <Col lg={8} md={24}>
+          <Card bordered={false} bodyStyle={{ ...bodyStyle.bodyStyle, padding: 0 }}>
+            <User {...user} />
+          </Card>
+        </Col>
         {numberCards}
         <Col lg={18} md={24}>
           <Card bordered={false}
@@ -80,21 +95,7 @@ function Home ({ home, loading }) {
             <Completed data={completed} />
           </Card>
         </Col>
-        <Col lg={8} md={24}>
-          <Card bordered={false} {...bodyStyle}>
-            <Browser data={browser} />
-          </Card>
-        </Col>
-        <Col lg={8} md={24}>
-          <Card bordered={false} {...bodyStyle}>
-            <Cpu {...cpu} />
-          </Card>
-        </Col>
-        <Col lg={8} md={24}>
-          <Card bordered={false} bodyStyle={{ ...bodyStyle.bodyStyle, padding: 0 }}>
-            <User {...user} />
-          </Card>
-        </Col>
+
       </Row>
     </Page>
   )

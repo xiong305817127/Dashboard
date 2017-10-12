@@ -1,7 +1,32 @@
 [
-
-{"id":"guest", "visit": ['1', '2', '21', '7', '5', '51', '52', '53'], "role": "guest" },
-{"id":"admin", "role": "admin" },
-{"id":"developer",  "role": "developer" }
-
+    {
+        "role": "admin",
+        "id": "admin",
+        "visit": []
+    },
+    {
+        "role": "guest",
+        "id": "guest",
+        "visit": [
+            "1"
+        ]
+    },
+    {
+        "role": "developer",
+        "id": "developer",
+        "visit": [
+            "1",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "4",
+            "51",
+            "52",
+            "53",
+            "5"
+        ]
+    }
 ]

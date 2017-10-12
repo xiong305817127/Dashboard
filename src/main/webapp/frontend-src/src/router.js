@@ -33,9 +33,6 @@ const Routers = function ({ history, app }) {
       models: () => [import('./models/login')],
       component: () => import('./routes/login/'),
     }, {
-      path: '/request',
-      component: () => import('./routes/request/'),
-    }, {
       path: '/UIElement/iconfont',
       component: () => import('./routes/UIElement/iconfont/'),
     }, {
@@ -62,10 +59,6 @@ const Routers = function ({ history, app }) {
     }, {
       path: '/chart/areaChart',
       component: () => import('./routes/chart/areaChart/'),
-    }, {
-      path: '/post',
-      models: () => [import('./models/post')],
-      component: () => import('./routes/post/'),
     },
    //dynamic add Route,Do not delete
   ]

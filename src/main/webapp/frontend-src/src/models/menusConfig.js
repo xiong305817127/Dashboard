@@ -16,6 +16,7 @@ export default modelExtend(model, {
     user:{},
     menu:[],
     isAdmin:true,
+    isDev:false,
     currentSelectMenu:{},
     showForm:false,
     modalType:"update",

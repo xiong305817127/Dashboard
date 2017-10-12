@@ -1,163 +1,137 @@
 [
     {
-        "id": "1",
+        "route": "/home",
+        "bpid": "",
         "icon": "laptop",
         "name": "Home",
-        "route": "/home"
+        "admin": false,
+        "id": "1",
+        "mpid": ""
     },
     {
-        "id": "2",
-        "bpid": "1",
-        "name": "Users",
-        "icon": "user",
         "route": "/user",
-        "admin": true
+        "bpid": "1",
+        "icon": "user",
+        "name": "Users",
+        "admin": true,
+        "id": "2",
+        "mpid": ""
     },
     {
-        "id": "3",
-        "bpid": "1",
-        "name": "Menus",
-        "icon": "menu-unfold",
         "route": "/menusConfig",
-        "admin": true
-    },
-    {
-        "id": "7",
         "bpid": "1",
-        "name": "Posts",
-        "icon": "shopping-cart",
-        "route": "/post"
+        "icon": "menu-unfold",
+        "name": "Menus",
+        "admin": true,
+        "id": "3",
+        "mpid": ""
     },
     {
-        "id": "21",
-        "mpid": "-1",
+        "route": "/user/:id",
         "bpid": "2",
+        "icon": "",
         "name": "User Detail",
-        "route": "/user/:id"
+        "admin": false,
+        "id": "21",
+        "mpid": "-1"
     },
     {
-        "id": "8",
+        "route": "",
         "bpid": "1",
-        "name": "Request",
-        "icon": "api",
-        "route": "/request"
-    },
-    {
-        "id": "4",
-        "bpid": "1",
+        "icon": "camera-o",
         "name": "UI Element",
-        "icon": "camera-o"
+        "admin": false,
+        "id": "4",
+        "mpid": ""
     },
     {
-        "id": "41",
+        "route": "/UIElement/iconfont",
         "bpid": "4",
-        "mpid": "4",
-        "name": "IconFont",
         "icon": "heart-o",
-        "route": "/UIElement/iconfont"
+        "name": "IconFont",
+        "admin": false,
+        "id": "41",
+        "mpid": "4"
     },
     {
-        "id": "42",
+        "route": "/UIElement/dataTable",
         "bpid": "4",
-        "mpid": "4",
-        "name": "DataTable",
         "icon": "database",
-        "route": "/UIElement/dataTable"
+        "name": "DataTable",
+        "admin": false,
+        "id": "42",
+        "mpid": "4"
     },
     {
-        "id": "43",
+        "route": "/UIElement/dropOption",
         "bpid": "4",
-        "mpid": "4",
-        "name": "DropOption",
         "icon": "bars",
-        "route": "/UIElement/dropOption"
+        "name": "DropOption",
+        "admin": false,
+        "id": "43",
+        "mpid": "4"
     },
     {
-        "id": "44",
+        "route": "/UIElement/search",
         "bpid": "4",
-        "mpid": "4",
-        "name": "Search",
         "icon": "search",
-        "route": "/UIElement/search"
+        "name": "Search",
+        "admin": false,
+        "id": "44",
+        "mpid": "4"
     },
     {
-        "id": "45",
+        "route": "/UIElement/editor",
         "bpid": "4",
-        "mpid": "4",
-        "name": "Editor",
         "icon": "edit",
-        "route": "/UIElement/editor"
+        "name": "Editor",
+        "admin": false,
+        "id": "45",
+        "mpid": "4"
     },
     {
-        "id": "46",
+        "route": "/UIElement/layer",
         "bpid": "4",
-        "mpid": "4",
-        "name": "layer (Function)",
         "icon": "credit-card",
-        "route": "/UIElement/layer"
+        "name": "layer (Function)",
+        "admin": false,
+        "id": "46",
+        "mpid": "4"
     },
     {
-        "id": "5",
+        "route": "",
         "bpid": "1",
+        "icon": "code-o",
         "name": "Recharts",
-        "icon": "code-o"
+        "admin": false,
+        "id": "5",
+        "mpid": ""
     },
     {
-        "id": "51",
+        "route": "/chart/lineChart",
         "bpid": "5",
-        "mpid": "5",
-        "name": "LineChart",
         "icon": "line-chart",
-        "route": "/chart/lineChart"
+        "name": "LineChart",
+        "admin": false,
+        "id": "51",
+        "mpid": "5"
     },
     {
-        "id": "52",
+        "route": "/chart/barChart",
         "bpid": "5",
-        "mpid": "5",
-        "name": "BarChart",
         "icon": "bar-chart",
-        "route": "/chart/barChart"
+        "name": "BarChart",
+        "admin": false,
+        "id": "52",
+        "mpid": "5"
     },
     {
-        "id": "53",
+        "route": "/chart/areaChart",
         "bpid": "5",
-        "mpid": "5",
-        "name": "AreaChart",
         "icon": "area-chart",
-        "route": "/chart/areaChart"
-    },
-    {
-        "id": "6",
-        "bpid": "1",
-        "name": "Test Navigation",
-        "icon": "setting"
-    },
-    {
-        "id": "61",
-        "bpid": "6",
-        "mpid": "6",
-        "name": "Test Navigation1",
-        "route": "/navigation/navigation1"
-    },
-    {
-        "id": "62",
-        "bpid": "6",
-        "mpid": "6",
-        "name": "Test Navigation2",
-        "route": "/navigation/navigation2"
-    },
-    {
-        "id": "621",
-        "bpid": "62",
-        "mpid": "62",
-        "name": "Test Navigation21",
-        "route": "/navigation/navigation2/navigation1"
-    },
-    {
-        "id": "622",
-        "bpid": "62",
-        "mpid": "62",
-        "name": "Test Navigation22",
-        "route": "/navigation/navigation2/navigation2"
+        "name": "AreaChart",
+        "admin": false,
+        "id": "53",
+        "mpid": "5"
     }
 ]

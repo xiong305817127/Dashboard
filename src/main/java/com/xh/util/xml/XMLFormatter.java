@@ -19,7 +19,7 @@
  * limitations under the License.
  *
  ******************************************************************************/
-package com.xh.xml;
+package com.xh.util.xml;
 
 import java.io.StringReader;
 import java.io.StringWriter;

@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.xh.xml;
+package com.xh.util.xml;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -67,7 +67,7 @@ import org.xml.sax.InputSource;
 
 import com.xh.common.exception.WebException;
 import com.xh.util.Utils;
-import com.xh.vfs.WebVFS;
+import com.xh.util.vfs.WebVFS;
 
 /**
  * This class contains a number of (static) methods to facilitate the retrieval

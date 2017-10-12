@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.xh.xml;
+package com.xh.util.xml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -3,7 +3,6 @@ package com.xh.service.user;
 import java.util.List;
 
 import com.xh.common.dto.PaginationDto;
-import com.xh.entry.Permission;
 import com.xh.entry.User;
 
 public interface UserService {

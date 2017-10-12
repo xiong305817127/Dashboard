@@ -7,6 +7,7 @@ import java.lang.reflect.Proxy;
 
 public class ProxyObjectUtil{
 	
+	@SuppressWarnings("unchecked")
 	public static <T> T getProxyObject(Class<T> interfaceClass ,Object obj){
 		T proxySubject = (T)Proxy.newProxyInstance(interfaceClass.getClassLoader(),  new Class[]{interfaceClass},  new ProxyHandler(obj));
 		return proxySubject;

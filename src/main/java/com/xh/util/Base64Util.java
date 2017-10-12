@@ -18,9 +18,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
 
-import com.mysql.fabric.xmlrpc.base.Data;
-import com.xh.entry.User;
-
+import com.xh.dto.UserDto;
 import net.sf.json.JSONObject;
 
 public class Base64Util {
@@ -32,7 +30,7 @@ public class Base64Util {
 	 * @param cookieData
 	 * @return
 	 */
-    public static User decodeUser(String cookieData){
+    public static UserDto decodeUser(String cookieData){
     	if(Utils.isEmpty(cookieData)){
     		return null;
     	}
@@ -43,7 +41,7 @@ public class Base64Util {
     		return null ;
     	}
     	userJson.remove("deadline");
-    	return  (User) JSONObject.toBean(userJson, User.class);
+    	return  (UserDto) JSONObject.toBean(userJson, UserDto.class);
     }
 
     /**
@@ -51,7 +49,7 @@ public class Base64Util {
      * @param cookieData
      * @return
      */
-    public static String encodeUser(User user){
+    public static String encodeUser(UserDto user){
     	if(user == null){
     		return null;
     	}

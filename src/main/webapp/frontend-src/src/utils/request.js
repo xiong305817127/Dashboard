@@ -91,7 +91,7 @@ export default function request (options) {
     const { statusText, status } = response
     let data = options.fetchType === 'YQL' ? response.data.query.results.json : response.data
 
-    if(data.statusCode == 401){
+    if(data.statusCode == 401 || !data.success){
     //未登录
       return Promise.reject(data)
      }

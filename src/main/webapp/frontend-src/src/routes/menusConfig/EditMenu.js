@@ -20,6 +20,7 @@ const formItemLayout = {
 const editMenu = ({
   menu = {},
   isAdmin=false,
+  isDev=false,
   modalType="update",
   onOk ,
   onDelete,
@@ -144,10 +145,10 @@ const editMenu = ({
                },
              ],
            })( <Switch  onChange={withTemplateChange}  key={ "createTemplate"} />  )}
-           {createTemplate && <strong className={styles.tipFont} > &nbsp;&nbsp;&nbsp;you may need to restart the development server</strong>}
+           {createTemplate && <strong className={styles.tipFont} > &nbsp;backend needs to configure variables 'project.source.path.root',you may need to restart the development server</strong>}
          </FormItem>}
 
-         <FormItem label="Route" hasFeedback {...formItemLayout}>
+         { isDev &&  <FormItem label="Route" hasFeedback {...formItemLayout}>
           {getFieldDecorator('route', {
             initialValue: menu.route,
             rules: [
@@ -158,7 +159,7 @@ const editMenu = ({
               },
             ],
           })(<Input key={ "route"} />)}
-        </FormItem>
+        </FormItem> }
 
          {  modalType === 'create' && <FormItem label="Parent" hasFeedback {...formItemLayout}>
            {getFieldDecorator('mpid', {
@@ -190,7 +191,7 @@ const editMenu = ({
               <Popconfirm title={`Are you sure ${modalType} these items?`}  placement="left" onConfirm={submitForm} >
                <Button type="primary" size="large"  className={styles.btn} >{modalType}</Button>
              </Popconfirm>
-             { modalType === 'update' &&  <Popconfirm title={`Are you sure delete these items?`}  placement="right" onConfirm={deleteItem}>
+             { (modalType === 'update'&& isDev) &&  <Popconfirm title={`Are you sure delete these items?`}  placement="right" onConfirm={deleteItem}>
                  <Button type="primary" size="large" >Delete</Button>
                </Popconfirm> }
            </div>

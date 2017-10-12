@@ -10,7 +10,12 @@ import com.xh.entry.Menu;
 
 public class MenuDto  extends Menu {
  
-    private transient Boolean createTemplate ;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7914634447346022937L;
+	
+	private transient Boolean createTemplate ;
     
 	/**
 	 * @return the createTemplate

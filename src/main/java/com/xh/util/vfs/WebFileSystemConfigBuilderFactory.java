@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.xh.vfs;
+package com.xh.util.vfs;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

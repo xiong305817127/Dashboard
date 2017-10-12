@@ -1,10 +1,10 @@
 package com.xh.service.login;
 
-import com.xh.entry.User;
+import com.xh.dto.UserDto;
 
 public interface LoginService {
 
-	public User login(User user) throws Exception;
+	public UserDto login(UserDto user) throws Exception;
 
 	public void logout() throws Exception;
 
