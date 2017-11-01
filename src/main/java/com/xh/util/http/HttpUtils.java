@@ -5,20 +5,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.util.ReflectionUtils;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.xh.common.exception.WebException;
 import com.xh.util.Utils;
 import com.xh.util.http.callback.HttpCallbackModelListener;
 import com.xh.util.http.callback.HttpCallbackStringListener;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
 
 /**
  * HttpURLConnection 网络请求工具类
@@ -26,12 +29,16 @@ import net.sf.json.util.JSONUtils;
  * 数据的请求都是基于HttpURLConnection的 请求成功与失败的回调都是在主线程
  */
 public class HttpUtils {
+	
+	private final static String ResponseFormatKey="httpformatJosn";
 
 	static ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	private final static int ConnectTimeout = 5000;
 	private final static int ReadTimeout = 10000;
 
+	private final static ObjectMapper mapper = new ObjectMapper();
+	
 	/**
 	 * 异步调用GET方法 返回数据会解析成字符串String
 	 * 
@@ -83,7 +90,7 @@ public class HttpUtils {
 	 * @throws IOException
 	 * @throws WebException
 	 */
-	public static <T> T doGet(String urlString, final Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doGet(String urlString, final Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
 		return doGeneralGet(urlString, "GET", cls, params, headers) ;
 	}
 	
@@ -149,18 +156,43 @@ public class HttpUtils {
 	public static <T> void doAsyncGeneralGet(String urlString,String method, HttpCallbackModelListener<T> listener, final Class<T> cls,Object params,Map<String,String> headers) {
 		// 因为网络请求是耗时操作，所以需要另外开启一个线程来执行该任务。
 		threadPool.execute(new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public void run() {
 				try {
 					String result = doConnectionGet(urlString,method,params,headers);
-					if (JSONUtils.mayBeJSON(result) && result.startsWith("{")) {
-						JSONObject resultJson = JSONObject.fromObject(result);
-						if (listener != null) {
-							listener.onFinish((T) JSONObject.toBean(resultJson, cls));
+					if(! Utils.isEmpty(result)) {
+						Field httpformatJosnField = ReflectionUtils.findField(cls, ResponseFormatKey);
+						if(httpformatJosnField != null) {
+							try {
+								String httpformatJosn = (String) httpformatJosnField.get(null);
+								if(!Utils.isEmpty(httpformatJosn)){
+									String[] keys = httpformatJosn.split(".") ;
+									Map map = mapper.readValue(result, Map.class);
+									Object map1 = null ;
+									for(String key :keys) {
+										map1 = map.get(key) ;
+										if(map1 instanceof Map) map = (Map)map1;
+									}
+									result = mapper.writeValueAsString(map1) ;
+								}
+								
+							} catch ( Exception e) {
+								//忽略
+							}
 						}
-					} else {
-						listener.onError(new WebException("Getting information is not in JSON format:" + result));
+						if ( result.startsWith("{")) {
+							if (listener != null) {
+								listener.onFinish(Lists.newArrayList(mapper.readValue(result, cls)));
+							}
+						}else if ( result.startsWith("[")) {
+							if (listener != null) {
+								JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+								listener.onFinish( (List<T>)mapper.readValue(result, collectionType));
+							}
+						}else {
+							listener.onError(new WebException("Getting information is not in JSON format:" + result));
+						}
 					}
 
 				} catch (WebException | IOException e) {
@@ -187,15 +219,41 @@ public class HttpUtils {
 	 * @throws IOException
 	 * @throws WebException
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T doGeneralGet(String urlString, String method , Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> List<T> doGeneralGet(String urlString, String method , Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
 		String result = doConnectionGet(urlString,method,params,headers);
-		if (JSONUtils.mayBeJSON(result) && result.startsWith("{")) {
-			JSONObject resultJson = JSONObject.fromObject(result);
-			return (T) JSONObject.toBean(resultJson, cls);
-		} else {
-			throw new WebException("Getting information is not in JSON format:" + result);
+		if(!Utils.isEmpty(result)) {
+			
+			Field httpformatJosnField = ReflectionUtils.findField(cls, ResponseFormatKey);
+			if(httpformatJosnField != null) {
+				try {
+					String httpformatJosn = (String) httpformatJosnField.get(null);
+					if(!Utils.isEmpty(httpformatJosn)){
+						String[] keys = httpformatJosn.split(".") ;
+						Map map = mapper.readValue(result, Map.class);
+						Object map1 = null ;
+						for(String key :keys) {
+							map1 = map.get(key) ;
+							if(map1 instanceof Map) map = (Map)map1;
+						}
+						result = mapper.writeValueAsString(map1) ;
+					}
+					
+				} catch ( Exception e) {
+					//忽略
+				}
+			}
+			
+			if ( result.startsWith("{")) {
+				return  Lists.newArrayList(mapper.readValue(result, cls)); 
+			}else if ( result.startsWith("[")) {
+				JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+				return  (List<T>)mapper.readValue(result, collectionType);
+			} else {
+				throw new WebException("Getting information is not in JSON format:" + result);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -220,9 +278,8 @@ public class HttpUtils {
 				Map paramsMap = null ;
 				if (params instanceof Map) {
 					paramsMap = (Map) params;
-				}else if (JSONUtils.isObject(params) ) {
-					paramsMap = Utils.newHashMap();
-					JSONObject.fromObject(params).putAll(paramsMap);
+				}else if (!(params instanceof String) ) {
+					paramsMap = mapper.readValue(mapper.writeValueAsString(params), Map.class);
 				}
 				String paramsStr = params.toString() ;
 				if( paramsMap != null){
@@ -357,7 +414,7 @@ public class HttpUtils {
 	 * @throws IOException 
 	 * @throws WebException 
 	 */
-	public static <T> T doPost(  String urlString, Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doPost(  String urlString, Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
 		return doGeneralPost(urlString, "POST", params, cls, headers);
 	}
 	
@@ -433,18 +490,43 @@ public class HttpUtils {
 	public static <T> void doAsyncGeneralPost(  String urlString, String method ,Object params,  HttpCallbackModelListener<T> listener, Class<T> cls,Map<String,String> headers){
 				// 因为网络请求是耗时操作，所以需要另外开启一个线程来执行该任务。
 				threadPool.execute(new Runnable() {
-					@SuppressWarnings("unchecked")
+					@SuppressWarnings({ "unchecked", "rawtypes" })
 					@Override
 					public void run() {
 						try {
 							String result = doConnectionPost(urlString,method, params,headers);
-							if (JSONUtils.mayBeJSON(result) && result.startsWith("{")) {
-								JSONObject resultJson = JSONObject.fromObject(result);
-								if (listener != null) {
-									listener.onFinish((T) JSONObject.toBean(resultJson, cls));
+							if(!Utils.isEmpty(result)) {
+								Field httpformatJosnField = ReflectionUtils.findField(cls, ResponseFormatKey);
+								if(httpformatJosnField != null) {
+									try {
+										String httpformatJosn = (String) httpformatJosnField.get(null);
+										if(!Utils.isEmpty(httpformatJosn)){
+											String[] keys = httpformatJosn.split(".") ;
+											Map map = mapper.readValue(result, Map.class);
+											Object map1 = null ;
+											for(String key :keys) {
+												map1 = map.get(key) ;
+												if(map1 instanceof Map) map = (Map)map1;
+											}
+											result = mapper.writeValueAsString(map1) ;
+										}
+										
+									} catch ( Exception e) {
+										//忽略
+									}
 								}
-							} else {
-								listener.onError(new WebException("Getting information is not in JSON format:" + result));
+								if ( result.startsWith("{")) {
+									if (listener != null) {
+										listener.onFinish(Lists.newArrayList(mapper.readValue(result, cls)));
+									}
+								}else if ( result.startsWith("[")) {
+									if (listener != null) {
+										JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+										listener.onFinish( (List<T>)mapper.readValue(result, collectionType));
+									}
+								} else {
+									listener.onError(new WebException("Getting information is not in JSON format:" + result));
+								}
 							}
 
 						} catch (WebException | IOException e) {
@@ -475,15 +557,42 @@ public class HttpUtils {
 	 * @throws IOException 
 	 * @throws WebException 
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T doGeneralPost(  String urlString,String method , Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> List<T> doGeneralPost(  String urlString,String method , Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
 		String result = doConnectionPost(urlString,method, params,headers);
-		if (JSONUtils.mayBeJSON(result) && result.startsWith("{")) {
-			JSONObject resultJson = JSONObject.fromObject(result);
-			return (T) JSONObject.toBean(resultJson, cls);
-		} else {
-			throw new WebException("Getting information is not in JSON format:" + result);
+		if(!Utils.isEmpty(result)) {
+			Field httpformatJosnField = ReflectionUtils.findField(cls, ResponseFormatKey);
+			if(httpformatJosnField != null) {
+				try {
+					String httpformatJosn = (String) httpformatJosnField.get(null);
+					if(!Utils.isEmpty(httpformatJosn)){
+						String[] keys = httpformatJosn.split(".") ;
+						Map map = mapper.readValue(result, Map.class);
+						Object map1 = null ;
+						for(String key :keys) {
+							map1 = map.get(key) ;
+							if(map1 instanceof Map) map = (Map)map1;
+						}
+						result = mapper.writeValueAsString(map1) ;
+					}
+					
+				} catch ( Exception e) {
+					//忽略
+				}
+			}
+			
+			if ( result.startsWith("{")) {
+				return  Lists.newArrayList(mapper.readValue(result, cls));
+			}else if ( result.startsWith("[")) {
+					JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+					return  (List<T>)mapper.readValue(result, collectionType);
+			} else {
+				throw new WebException("Getting information is not in JSON format:" + result);
+			}
+			
 		}
+		return null;
+		
 	}
 	
 
@@ -516,24 +625,23 @@ public class HttpUtils {
 			
 			final StringBuffer out = new StringBuffer();
 			// 组织请求参数
-			if (params instanceof Map) {
-				Map paramsMap = (Map) params;
-				for (Object key : paramsMap.keySet()) {
-					if (out.length() != 0) {
-						out.append("&");
+			if(params !=  null) {
+				if (params instanceof Map) {
+					Map paramsMap = (Map) params;
+					for (Object key : paramsMap.keySet()) {
+						if (out.length() != 0) {
+							out.append("&");
+						}
+						out.append(key).append("=").append(paramsMap.get(key));
 					}
-					out.append(key).append("=").append(paramsMap.get(key));
+					httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+				} else if ( (!(params instanceof String)) || params.toString().startsWith("{") || params.toString().startsWith("[")) {
+					out.append(mapper.writeValueAsString(params));
+					httpURLConnection.setRequestProperty("Content-Type", "application/json");
+				} else {
+					out.append(params);
+					httpURLConnection.setRequestProperty("Content-Type", "text/plain");
 				}
-				httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			} else if (JSONUtils.isObject(params) ) {
-				out.append(JSONObject.fromObject(params).toString());
-				httpURLConnection.setRequestProperty("Content-Type", "application/json");
-			}else if( JSONUtils.isArray(params)){
-				out.append(JSONArray.fromObject(params).toString());
-				httpURLConnection.setRequestProperty("Content-Type", "application/json");
-			} else {
-				out.append(JSONUtils.valueToString(params));
-				httpURLConnection.setRequestProperty("Content-Type", "text/plain");
 			}
 			
 			httpURLConnection.setRequestProperty("accept", "*/*");
