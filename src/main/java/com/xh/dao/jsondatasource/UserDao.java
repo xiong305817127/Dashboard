@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.xh.common.exception.WebException;
+import com.xh.dao.jsondatasource.jsonDatabase.ConditionFilter;
 import com.xh.dao.jsondatasource.jsonDatabase.JsonDataSource;
 import com.xh.entry.User;
 import com.xh.util.Utils;
@@ -21,35 +22,9 @@ public class UserDao {
 	
 	private final String tableName = "Users" ;
 	private final Class<User> t = User.class ;
-	private final JsonDataSource.KeyFilter<User> userIdfilter = new JsonDataSource.KeyFilter<User>(){
-
-		@Override
-		public boolean findByKey(User u,Object key) {
-			return u != null &&isEqual(u.getId(), key);
-		}
-		
-	};
-	
-	private final JsonDataSource.KeyFilter<User> userNamefilter = new JsonDataSource.KeyFilter<User>(){
-
-		@Override
-		public boolean findByKey(User u,Object key) {
-			return u != null &&isEqual(u.getUsername(), key);
-		}
-		
-	};
-	
-	private final JsonDataSource.KeyFilter<User> permissionfilter = new JsonDataSource.KeyFilter<User>(){
-
-		@Override
-		public boolean findByKey(User u,Object key) {
-			return u != null &&isEqual(u.getPermissionId(), key);
-		}
-		
-	};
 	
 	public User getUserById(String id) throws Exception{
-		User user = datasource.findRowByKey(tableName, id, userIdfilter, t);
+		User user = datasource.findRowByKey(tableName, new ConditionFilter<User>("id",id), t);
 		if( user == null){
 			throw new WebException(" user :"+id +"  not exist!");
 		}
@@ -58,7 +33,7 @@ public class UserDao {
 	}
 	
 	public User getUserByUserName(String userName) throws Exception{
-		User user = datasource.findRowByKey(tableName, userName, userNamefilter, t);
+		User user = datasource.findRowByKey(tableName, new ConditionFilter<User>("username",userName), t);
 		if( user == null){
 			throw new WebException(" user :"+userName +"  not exist!");
 		}
@@ -80,7 +55,7 @@ public class UserDao {
 	}
 	
 	public List<User> getUserListByPermission(String role) throws Exception{
-		List<User> userList = datasource.findListRowByKey(tableName, role, permissionfilter, t);
+		List<User> userList = datasource.findListRowByKey(tableName, new ConditionFilter<User>("permissionId",role), t);
 		return Utils.transListToList(userList, new Utils.DtoTransData<User>() {
 			@Override
 			public User dealData(Object obj, int index) throws Exception {
@@ -119,11 +94,11 @@ public class UserDao {
 	
 	
 	public User deleteUser(String userId) throws Exception {
-		return datasource.deleteByKey(tableName, userId, userIdfilter, t);
+		return datasource.deleteByKey(tableName, new ConditionFilter<User>("id",userId), t);
 	}
 	
 	public User updateUser(User user) throws Exception {
-		return datasource.updateTableRow(tableName, user, user.getUsername(), userNamefilter, t);
+		return datasource.updateTableRow(tableName, user, new ConditionFilter<User>("username", user.getUsername()), t);
 	}
 	
 }

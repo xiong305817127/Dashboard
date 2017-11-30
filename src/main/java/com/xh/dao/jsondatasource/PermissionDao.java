@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.xh.common.exception.WebException;
+import com.xh.dao.jsondatasource.jsonDatabase.ConditionFilter;
 import com.xh.dao.jsondatasource.jsonDatabase.JsonDataSource;
 import com.xh.entry.Permission;
 
@@ -17,18 +18,10 @@ public class PermissionDao {
 
 	private final String tableName = "Permission";
 	private final Class<Permission> t = Permission.class;
-	private final JsonDataSource.KeyFilter<Permission> rolefilter = new JsonDataSource.KeyFilter<Permission>() {
-
-		@Override
-		public boolean findByKey(Permission u, Object key) {
-			return u != null && isEqual(u.getRole(), key);
-		}
-
-	};
 
 	public Permission getPermissionByRole(String role) throws Exception {
 		
-		Permission permission = datasource.findRowByKey(tableName, role, rolefilter, t);
+		Permission permission = datasource.findRowByKey(tableName,  new ConditionFilter<Permission>("role", role), t);
 		if( permission == null){
 			throw new WebException(" permission :"+role +"  not exist!");
 		}
@@ -44,11 +37,11 @@ public class PermissionDao {
 	}
 
 	public Permission deletePermission(String role) throws Exception {
-		return datasource.deleteByKey(tableName, role, rolefilter, t);
+		return datasource.deleteByKey(tableName,  new ConditionFilter<Permission>("role", role), t);
 	}
 
 	public Permission updatePermission(Permission permission) throws Exception {
-		return datasource.updateTableRow(tableName, permission, permission.getRole(), rolefilter, t);
+		return datasource.updateTableRow(tableName, permission, new ConditionFilter<Permission>("role",  permission.getRole()), t);
 	}
 
 }

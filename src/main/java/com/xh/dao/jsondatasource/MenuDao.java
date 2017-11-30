@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.xh.common.exception.WebException;
+import com.xh.dao.jsondatasource.jsonDatabase.ConditionFilter;
 import com.xh.dao.jsondatasource.jsonDatabase.JsonDataSource;
 import com.xh.entry.Menu;
 
@@ -18,44 +19,9 @@ public class MenuDao {
 	
 	private final String tableName = "Menu" ;
 	private final Class<Menu> t = Menu.class ;
-	private final JsonDataSource.KeyFilter<Menu> idFilter = new JsonDataSource.KeyFilter<Menu>(){
-
-		@Override
-		public boolean findByKey(Menu m,Object key) {
-			return m != null &&isEqual(m.getId(), key);
-		}
-		
-	};
-	
-	private final JsonDataSource.KeyFilter<Menu> nameFilter = new JsonDataSource.KeyFilter<Menu>(){
-
-		@Override
-		public boolean findByKey(Menu m,Object key) {
-			return m != null &&isEqual(m.getName(), key);
-		}
-		
-	};
-	
-	private final JsonDataSource.KeyFilter<Menu> routeFilter = new JsonDataSource.KeyFilter<Menu>(){
-
-		@Override
-		public boolean findByKey(Menu m,Object key) {
-			return m != null &&isEqual(m.getRoute(), key);
-		}
-		
-	};
-	
-	private final JsonDataSource.KeyFilter<Menu> mpidFilter = new JsonDataSource.KeyFilter<Menu>(){
-
-		@Override
-		public boolean findByKey(Menu m,Object key) {
-			return m != null &&isEqual(m.getMpid(), key);
-		}
-		
-	};
 	
 	public Menu getMenuByName(String name) throws Exception{
-		Menu menu = datasource.findRowByKey(tableName, name, nameFilter, t);
+		Menu menu = datasource.findRowByKey(tableName, new ConditionFilter<Menu>("name", name), t);
 		if( menu == null){
 			throw new WebException(" menu:"+name +"  not exist!");
 		}
@@ -63,7 +29,7 @@ public class MenuDao {
 	}
 	
 	public Menu getMenuByRoute(String route) throws Exception{
-		Menu menu = datasource.findRowByKey(tableName, route, routeFilter, t);
+		Menu menu = datasource.findRowByKey(tableName, new ConditionFilter<Menu>("route", route), t);
 		if( menu == null){
 			throw new WebException(" menu route:"+route +"  not exist!");
 		}
@@ -71,7 +37,7 @@ public class MenuDao {
 	}
 	
 	public Menu getMenuById(String id) throws Exception{
-		Menu menu = datasource.findRowByKey(tableName, id, idFilter, t);
+		Menu menu = datasource.findRowByKey(tableName, new ConditionFilter<Menu>("id", id), t);
 		if( menu == null){
 			throw new WebException(" menu:"+id +"  not exist!");
 		}
@@ -94,7 +60,7 @@ public class MenuDao {
 	}
 	
 	public List<Menu> getMenuListByMpid(String mpid) throws Exception{
-		return datasource.findListRowByKey(tableName, mpid, mpidFilter, t);
+		return datasource.findListRowByKey(tableName, new ConditionFilter<Menu>("mpid", mpid), t);
 	}
 	
 	public void addMenu(Menu menu) throws Exception {
@@ -103,11 +69,11 @@ public class MenuDao {
 	
 	
 	public Menu deleteMenu(String menuId) throws Exception {
-		return datasource.deleteByKey(tableName, menuId, idFilter, t);
+		return datasource.deleteByKey(tableName,  new ConditionFilter<Menu>("id", menuId), t);
 	}
 	
 	public Menu updateMenu(Menu menu) throws Exception {
-		return datasource.updateTableRow(tableName, menu, menu.getId(), idFilter, t);
+		return datasource.updateTableRow(tableName, menu, new ConditionFilter<Menu>("id", menu.getId()), t);
 	}
 	
 	public int getMaxId() throws Exception {

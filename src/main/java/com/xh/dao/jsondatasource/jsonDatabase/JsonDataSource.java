@@ -56,10 +56,10 @@ public class JsonDataSource {
 		
 	}
 	
-	public <T> T findRowByKey(String tableName,Object key ,  KeyFilter<T> filter , Class<T> t) throws Exception{
+	public <T> T findRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws Exception{
 		
 		List<T> list = getListFromTable(tableName, t);
-		Optional<T> opt = list.stream().filter( tt -> { return filter.findByKey(tt,key);}).findFirst();
+		Optional<T> opt = list.stream().filter( tt -> { return filter.findByCondition(tt);}).findFirst();
 		if( opt.isPresent()){
 			return opt.get();
 		}
@@ -67,14 +67,14 @@ public class JsonDataSource {
 	}
 	
 	
-	public <T> List<T> findListRowByKey(String tableName,Object key ,  KeyFilter<T> filter , Class<T> t) throws Exception{
+	public <T> List<T> findListRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws Exception{
 		
 		List<T> list = getListFromTable(tableName, t);
-		return list.stream().filter( tt -> { return filter.findByKey(tt,key);}).collect(Collectors.toList());
+		return list.stream().filter( tt -> { return filter.findByCondition(tt);}).collect(Collectors.toList());
 	}
 	
-	public <T> T updateTableRow(String tableName, T tt,Object key , KeyFilter<T> filter, Class<T> t) throws Exception{
-		T old = deleteByKey(tableName,key, filter, t);
+	public <T> T updateTableRow(String tableName, T tt, ConditionFilter<T> filter, Class<T> t) throws Exception{
+		T old = deleteByKey(tableName, filter, t);
 		addTableRow(tableName, tt, t);
 		return old ;
 	}
@@ -87,10 +87,10 @@ public class JsonDataSource {
 		
 	}
 	
-	public <T> T deleteByKey(String tableName, Object key ,KeyFilter<T> filter, Class<T> t) throws Exception{
+	public <T> T deleteByKey(String tableName,ConditionFilter<T> filter, Class<T> t) throws Exception{
 		
 		List<T> list = getListFromTable(tableName, t);
-		List<T> needToDel = list.stream().filter( tt -> { return filter.findByKey(tt,key);}).collect(Collectors.toList());
+		List<T> needToDel = list.stream().filter( tt -> { return filter.findByCondition(tt);}).collect(Collectors.toList());
 		for(T tt: needToDel){
 			list.remove(tt);
 		}
@@ -123,12 +123,4 @@ public class JsonDataSource {
 		WebVFS.writerTextFileContent(fileName, JSONArray.fromObject(list).toString(), "UTF-8");
 	}
 	
-	public interface KeyFilter<T>{
-		
-		boolean findByKey( T t ,Object key);
-		
-		default boolean isEqual(Object obj,Object key){
-			return obj!=null && obj.equals(key) ;
-		}
-	}
 }
