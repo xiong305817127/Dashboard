@@ -40,5 +40,9 @@
 
 	<mvc:resources mapping="/swagger/**" location="/swagger/" />
 	<mvc:resources mapping="/*" location="/frontend/" />
+	
+	<mvc:cors>
+    	<mvc:mapping path="/**" />
+	</mvc:cors>
 
 </beans>
