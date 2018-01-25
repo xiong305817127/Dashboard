@@ -45,7 +45,7 @@ public class QuartzManager  {
 		//线程池大小
 		System.setProperty("org.quartz.threadPool.threadCount", "50");
 		//设置线程池为自定义的线程池
-		System.setProperty("org.quartz.threadPool.class", "com.ys.ts.scheduler.manager.TaskExecutorThreadPool");
+		System.setProperty("org.quartz.threadPool.class", "com.xh.scheduler.manager.TaskExecutorThreadPool");
 	}
 	
 	public static SchedulerFactory getSchedulerFactory(){
@@ -209,7 +209,7 @@ public class QuartzManager  {
 	    		triggerName = jobName ;
 	    	}
 	    	if(StringUtils.isEmpty(triggerGroupName)) {
-	    		triggerName = TRIGGER_GROUP_NAME ;
+	    		triggerGroupName = TRIGGER_GROUP_NAME ;
 	    	}
 	    	
 	        Scheduler sched = getSchedulerFactory().getScheduler();                                         //通过SchedulerFactory构建Scheduler对象
@@ -222,9 +222,13 @@ public class QuartzManager  {
 	        if( repeatCount != null && seconds != null) {
 	        	schedule.withIntervalInSeconds(seconds).withRepeatCount(repeatCount);
 	        }
+	        if(seconds != null && repeatCount == null) {
+	        	schedule.withIntervalInSeconds(seconds).repeatForever() ;
+	        }
 	        
 	        SimpleTrigger trigger = (SimpleTrigger) TriggerBuilder
 	        		.newTrigger()
+	        		.withIdentity(triggerName, triggerGroupName)
 	        		.startAt(DateBuilder.futureDate(5, IntervalUnit.SECOND)) 
 	        		.withIdentity(jobName, triggerGroupName)
 	        		.withSchedule(schedule)

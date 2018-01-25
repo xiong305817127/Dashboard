@@ -54,14 +54,8 @@ public class SsoFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) res;
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpSession session = request.getSession(true);
-		
-		String contextPath = request.getServletPath();
-		Optional<String> optUri = ExcludeUriPattern.stream().filter( uriPattern -> { return Utils.stringMatcher(contextPath, uriPattern) ; }).findAny() ;
-		if(optUri.isPresent()){
-			fc.doFilter(req, res);
-			return ;
-		}
-		
+
+		//查找cookie中的认证信息
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null && cookies.length > 0) {
 			Optional<Cookie> opt = Arrays.asList(cookies).stream().filter(cookis -> {
@@ -70,7 +64,7 @@ public class SsoFilter implements Filter {
 			}).findAny();
 
 			if (opt.isPresent()) {
-				//更新时间
+				//找到用户信息,更新时间
 				Cookie cookie = opt.get();
 				UserDto user = Base64Util.decodeUser(cookie.getValue());
 				request.setAttribute("user", user);
@@ -84,7 +78,14 @@ public class SsoFilter implements Filter {
 				return;
 			}
 		}
-
+		//没有认证信息,判断是否一定需要认证
+		String contextPath = request.getServletPath();
+		Optional<String> optUri = ExcludeUriPattern.stream().filter( uriPattern -> { return Utils.stringMatcher(contextPath, uriPattern) ; }).findAny() ;
+		if(optUri.isPresent()){
+			fc.doFilter(req, res);
+			return ;
+		}
+		
 		// 未登录
 		response.getOutputStream().write(JSONObject.fromObject(new ReturnCodeDto(false ,"not login!",null,401)).toString().getBytes());
 		return;

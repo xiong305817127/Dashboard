@@ -5,6 +5,7 @@
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	         http://www.springframework.org/schema/beans/spring-beans.xsd
 	         http://www.springframework.org/schema/lang
@@ -20,7 +21,9 @@
 	         http://www.springframework.org/schema/cache
 	         http://www.springframework.org/schema/cache/spring-cache.xsd
 	         http://www.springframework.org/schema/task 
-	         http://www.springframework.org/schema/task/spring-task.xsd">
+	         http://www.springframework.org/schema/task/spring-task.xsd 
+	         http://www.springframework.org/schema/websocket
+	         http://www.springframework.org/schema/websocket/spring-websocket.xsd">
 
 	<context:property-placeholder location="classpath*:/config.properties" ignore-resource-not-found="true" ignore-unresolvable="true" />
 
@@ -44,5 +47,14 @@
 	<mvc:cors>
     	<mvc:mapping path="/**" />
 	</mvc:cors>
+	
+	<bean id="websocket" class="com.xh.websocket.endpoint.WebsocketEndPoint"/>  
+  
+	<websocket:handlers allowed-origins="*" >  
+	    <websocket:mapping path="/ws/websocket" handler="websocket"/>  
+	    <websocket:handshake-interceptors>  
+	    	<bean class="com.xh.websocket.config.HandshakeInterceptor"/>  
+	    </websocket:handshake-interceptors>  
+	</websocket:handlers> 
 
 </beans>

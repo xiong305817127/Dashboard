@@ -48,5 +48,21 @@ import org.springframework.stereotype.Component;
 	    	}
 	    	return retObj;
 	    }  
+	    
+	    /**
+	     * 根据一个bean name获取一个bean
+	     * @param name 在spring配置文件配置的bean name
+	     * @return java bean
+	     * @throws CommonException 
+	     */
+	    public static Object getBean(Class<?> name)  { 
+	    	Object retObj=null;
+	    	try{
+	    		retObj=applicationContext.getBean(name);  
+	    	}catch(BeansException e){
+	    		LOGGER.error(e.getMessage());
+	    	}
+	    	return retObj;
+	    }  
 	  
 	} 
