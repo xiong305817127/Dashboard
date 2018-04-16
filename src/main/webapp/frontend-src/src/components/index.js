@@ -1,3 +1,4 @@
+import Condition from './Condition'
 import DataTable from './DataTable'
 import DropOption from './DropOption'
 import Iconfont from './Iconfont'
@@ -21,4 +22,5 @@ export {
   Loader,
   layer,
   Page,
+  Condition,
 }

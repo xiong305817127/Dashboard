@@ -50,6 +50,9 @@ const Routers = function ({ history, app }) {
     }, {
       path: '/UIElement/editor',
       component: () => import('./routes/UIElement/editor/'),
+    },{
+        path: '/UIElement/condition',
+        component: () => import('./routes/UIElement/condition/'),
     }, {
       path: '/chart/lineChart',
       component: () => import('./routes/chart/lineChart/'),
@@ -60,7 +63,8 @@ const Routers = function ({ history, app }) {
       path: '/chart/areaChart',
       component: () => import('./routes/chart/areaChart/'),
     },
-   //dynamic add Route,Do not delete
+
+    //dynamic add Route,Do not delete
   ]
 
   return (

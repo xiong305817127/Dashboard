@@ -55,7 +55,7 @@
   },
   "pre-commit": ["lint"],
   "scripts": {
-    "dev": "cross-env BROWSER=none HOST=0.0.0.0 roadhog server",
+    "dev": "set port=8008 && cross-env BROWSER=none HOST=0.0.0.0 roadhog server",
     "lint": "eslint --fix --ext .js src",
     "build": "roadhog build",
     "build:dll": "roadhog buildDll",
