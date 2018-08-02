@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 import com.xh.dao.jsondatasource.jsonDatabase.ConditionFilter;
 import com.xh.dao.jsondatasource.jsonDatabase.JsonDataSource;
-import com.xh.entry.Permission;
+import com.xh.dto.PermissionDto;
 
 @Component
 public class PermissionDao {
@@ -16,32 +16,32 @@ public class PermissionDao {
 	@Autowired
 	JsonDataSource datasource;
 
-	private final String tableName = "Permission";
-	private final Class<Permission> t = Permission.class;
+	private final String tableName = "PermissionDto";
+	private final Class<PermissionDto> t = PermissionDto.class;
 
-	public Permission getPermissionByRole(String role) throws Exception {
+	public PermissionDto getPermissionByRole(String role) throws CommonException {
 		
-		Permission permission = datasource.findRowByKey(tableName,  new ConditionFilter<Permission>("role", role), t);
-		if( permission == null){
-			throw new WebException(" permission :"+role +"  not exist!");
+		PermissionDto PermissionDto = datasource.findRowByKey(tableName,  new ConditionFilter<PermissionDto>("role", role), t);
+		if( PermissionDto == null){
+			throw new CommonException(" PermissionDto :"+role +"  not exist!");
 		}
-		return permission ;
+		return PermissionDto ;
 	}
 
-	public List<Permission> getPermissionList() throws Exception {
+	public List<PermissionDto> getPermissionList() throws CommonException {
 		return datasource.getListFromTable(tableName, t);
 	}
 
-	public void addPermission(Permission permission) throws Exception {
-		datasource.addTableRow(tableName, permission, t);
+	public void addPermission(PermissionDto PermissionDto) throws CommonException {
+		datasource.addTableRow(tableName, PermissionDto, t);
 	}
 
-	public Permission deletePermission(String role) throws Exception {
-		return datasource.deleteByKey(tableName,  new ConditionFilter<Permission>("role", role), t);
+	public PermissionDto deletePermission(String role) throws CommonException {
+		return datasource.deleteByKey(tableName,  new ConditionFilter<PermissionDto>("role", role), t);
 	}
 
-	public Permission updatePermission(Permission permission) throws Exception {
-		return datasource.updateTableRow(tableName, permission, new ConditionFilter<Permission>("role",  permission.getRole()), t);
+	public PermissionDto updatePermission(PermissionDto PermissionDto) throws CommonException {
+		return datasource.updateTableRow(tableName, PermissionDto, new ConditionFilter<PermissionDto>("role",  PermissionDto.getRole()), t);
 	}
 
 }

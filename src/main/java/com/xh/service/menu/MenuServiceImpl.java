@@ -6,11 +6,11 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.xh.common.exception.WebException;
-import com.xh.common.service.BaseService;
+import com.xh.common.CommonException;
 import com.xh.dao.jsondatasource.MenuDao;
 import com.xh.dto.MenuDto;
-import com.xh.entry.Menu;
+import com.xh.service.common.BaseService;
+import com.xh.service.common.ServiceException;
 import com.xh.util.Utils;
 
 /**
@@ -26,32 +26,32 @@ public class MenuServiceImpl extends BaseService implements MenuService{
 	private MenuDao menuDao;
 
 	@Override
-	public void addMenu(MenuDto menu) throws Exception {
+	public void addMenu(MenuDto menu) throws CommonException {
 		
 		if( menu ==null || Utils.isEmpty(menu.getName()) ){
-			throw new WebException(" menu cannot be empty !");
+			throw new ServiceException(" menu cannot be empty !");
 		}
-		Menu oldMenu= null;
+		MenuDto oldMenu= null;
 		try{
 			oldMenu = getMenuByName(menu.getName());
-		}catch(Exception e){
+		}catch(CommonException e){
 		}
 		if(oldMenu != null){
-			throw new WebException(" menu "+oldMenu.getName()+" already exists !");
+			throw new ServiceException(" menu "+oldMenu.getName()+" already exists !");
 		}
 		if( !Utils.isEmpty(menu.getRoute()) ){
 			oldMenu= null;
 			try{
 				oldMenu = menuDao.getMenuByRoute(menu.getRoute()) ;
-			}catch(Exception e){
+			}catch(CommonException e){
 			}
 			if(oldMenu != null){
-				throw new WebException(" menu Route "+oldMenu.getRoute()+" already exists !");
+				throw new ServiceException(" menu Route "+oldMenu.getRoute()+" already exists !");
 			}
 		}
 		if(menu.isCreateTemplate() !=null && menu.isCreateTemplate()){
 			if( Utils.isEmpty(menu.getRoute()) ){
-				throw new WebException(" Create Template ,menu Route cannot be empty  !");
+				throw new ServiceException(" Create Template ,menu Route cannot be empty  !");
 			}
 			MenuCreateFile.createFile(menu);
 		}
@@ -60,42 +60,42 @@ public class MenuServiceImpl extends BaseService implements MenuService{
 	}
 
 	@Override
-	public Menu deleteMenuByKey(String key) throws Exception {
+	public MenuDto deleteMenuByKey(String key) throws CommonException {
 		
-		Menu oldMenu  = getMenuByKey(key);
+		MenuDto oldMenu  = getMenuByKey(key);
 		if (oldMenu.isAdmin()) {
-			throw new WebException("  menu "+oldMenu.getName() +" is cannot be deleted ");
+			throw new ServiceException("  menu "+oldMenu.getName() +" is cannot be deleted ");
 		}
 		
-		List<Menu> childList = getCascadeMenuByKey(key);
-		for(Menu childMenu : childList){
+		List<MenuDto> childList = getCascadeMenuByKey(key);
+		for(MenuDto childMenu : childList){
 			menuDao.deleteMenu(childMenu.getId());
 		}
 		return menuDao.deleteMenu(key);
 	}
 
 	@Override
-	public Menu updateMenuByKey(String id ,Menu menu) throws Exception {
-		Menu oldMenu = menuDao.getMenuById(id);
+	public MenuDto updateMenuByKey(String id ,MenuDto menu) throws CommonException {
+		MenuDto oldMenu = menuDao.getMenuById(id);
 		if(oldMenu.isAdmin()){
-			throw new WebException(" the menu "+oldMenu.getName() +" cannot be modified !") ;
+			throw new ServiceException(" the menu "+oldMenu.getName() +" cannot be modified !") ;
 		}
 		updateObjectToBean(menu, oldMenu);
 		return menuDao.updateMenu(oldMenu);
 	}
 
 	@Override
-	public Menu getMenuByKey(String key) throws Exception {
+	public MenuDto getMenuByKey(String key) throws CommonException {
 		return menuDao.getMenuById(key);
 	}
 	
 	
-	private List<Menu> getCascadeMenuByKey(String key) throws Exception {
-		List<Menu> result = Utils.newArrayList();
-		List<Menu> childList = menuDao.getMenuListByMpid(key);
+	private List<MenuDto> getCascadeMenuByKey(String key) throws CommonException {
+		List<MenuDto> result = Utils.newArrayList();
+		List<MenuDto> childList = menuDao.getMenuListByMpid(key);
 		if(childList!=null && childList.size() >0){
 			result.addAll(childList);
-			for(Menu childMenu:childList){
+			for(MenuDto childMenu:childList){
 				result.addAll(getCascadeMenuByKey(childMenu.getId()));
 			} 
 		}
@@ -104,13 +104,13 @@ public class MenuServiceImpl extends BaseService implements MenuService{
 	}
 	
 	
-	public Menu getMenuByName(String name) throws Exception {
+	public MenuDto getMenuByName(String name) throws CommonException {
 		return menuDao.getMenuByName(name) ;
 	}
 	
 
 	@Override
-	public List<Menu> getMenuList() throws Exception {
+	public List<MenuDto> getMenuList() throws CommonException {
 		return  menuDao.getMenuListBySort();
 	}
 	

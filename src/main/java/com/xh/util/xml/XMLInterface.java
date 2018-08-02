@@ -22,7 +22,7 @@
 
 package com.xh.util.xml;
 
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 
 /**
  * Implementing classes of this interface know how to express themselves using XML They also can construct themselves
@@ -39,6 +39,6 @@ public interface XMLInterface {
    * @throws KettleException
    *           in case there is an encoding problem.
    */
-  public String getXML() throws WebException;
+  public String getXML() throws CommonException;
 
 }

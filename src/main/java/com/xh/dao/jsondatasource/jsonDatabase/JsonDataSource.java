@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.xh.common.CommonException;
 import com.xh.util.Utils;
 import com.xh.util.vfs.WebVFS;
 
@@ -17,7 +18,7 @@ import net.sf.json.JSONObject;
 public class JsonDataSource {
 	
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getListFromTable(String tableName, Class<T> t) throws Exception{
+	public <T> List<T> getListFromTable(String tableName, Class<T> t) throws CommonException{
 		
 		JSONArray jsonList = getTableFile(tableName);
 		return (List<T>) JSONArray.toCollection(jsonList, t);
@@ -25,12 +26,12 @@ public class JsonDataSource {
 	}
 	
 	
-	public <T> List<T> getListFromTableBySort(String tableName, Class<T> t,Comparator<? super T> comparator) throws Exception{
+	public <T> List<T> getListFromTableBySort(String tableName, Class<T> t,Comparator<? super T> comparator) throws CommonException{
 		List<T> list = getListFromTable(tableName, t);
 		return list.stream().sorted(comparator).collect(Collectors.toList());
 	}
 	
-	public <T> int getMaxId(String tableName) throws Exception{
+	public <T> int getMaxId(String tableName) throws CommonException{
 		
 		JSONArray jsonList = getTableFile(tableName);
 		int maxId = 0;
@@ -40,7 +41,7 @@ public class JsonDataSource {
 			if(obj.containsKey("id")){
 				try {
 					idInt = Integer.parseInt(obj.get("id").toString()) ;
-				} catch (Exception e) {
+				} catch ( Exception e) {
 				}
 			}
 			
@@ -56,7 +57,7 @@ public class JsonDataSource {
 		
 	}
 	
-	public <T> T findRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws Exception{
+	public <T> T findRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws CommonException{
 		
 		List<T> list = getListFromTable(tableName, t);
 		Optional<T> opt = list.stream().filter( tt -> { return filter.findByCondition(tt);}).findFirst();
@@ -67,19 +68,19 @@ public class JsonDataSource {
 	}
 	
 	
-	public <T> List<T> findListRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws Exception{
+	public <T> List<T> findListRowByKey(String tableName, ConditionFilter<T> filter , Class<T> t) throws CommonException{
 		
 		List<T> list = getListFromTable(tableName, t);
 		return list.stream().filter( tt -> { return filter.findByCondition(tt);}).collect(Collectors.toList());
 	}
 	
-	public <T> T updateTableRow(String tableName, T tt, ConditionFilter<T> filter, Class<T> t) throws Exception{
+	public <T> T updateTableRow(String tableName, T tt, ConditionFilter<T> filter, Class<T> t) throws CommonException{
 		T old = deleteByKey(tableName, filter, t);
 		addTableRow(tableName, tt, t);
 		return old ;
 	}
 	
-	public <T> void addTableRow(String tableName, T tt, Class<T> t) throws Exception{
+	public <T> void addTableRow(String tableName, T tt, Class<T> t) throws CommonException{
 		
 		List<T> list = getListFromTable(tableName, t);
 		list.add(tt);
@@ -87,7 +88,7 @@ public class JsonDataSource {
 		
 	}
 	
-	public <T> T deleteByKey(String tableName,ConditionFilter<T> filter, Class<T> t) throws Exception{
+	public <T> T deleteByKey(String tableName,ConditionFilter<T> filter, Class<T> t) throws CommonException{
 		
 		List<T> list = getListFromTable(tableName, t);
 		List<T> needToDel = list.stream().filter( tt -> { return filter.findByCondition(tt);}).collect(Collectors.toList());
@@ -100,11 +101,15 @@ public class JsonDataSource {
 		
 	}
 	
-	public   JSONArray  getTableFile(String tableName) throws  Exception{
+	public   JSONArray  getTableFile(String tableName) throws  CommonException{
 		
 		String fileName = JsonDataSource.class.getClassLoader().getResource("").getPath()+"/"+JsonDataSource.class.getPackage().getName().replaceAll("\\.", "/")+"/"+tableName+".json";
 		if( !WebVFS.fileExists(fileName)){
-			WebVFS.createFile(fileName);
+			try {
+				WebVFS.createFile(fileName);
+			} catch (Exception e) {
+				throw CommonException.parseException(e);
+			}
 		}
 		
 		String jsonStr = WebVFS.getTextFileContent(fileName, "UTF-8");
@@ -114,13 +119,17 @@ public class JsonDataSource {
 		return JSONArray.fromObject(jsonStr);
 	}
 	
-	private <T>  void  saveTableFile(String tableName,List<T> list) throws  Exception{
-		
-		String fileName = JsonDataSource.class.getClassLoader().getResource("").getPath()+"/"+JsonDataSource.class.getPackage().getName().replaceAll("\\.", "/")+"/"+tableName+".json";
-		if( !WebVFS.fileExists(fileName)){
-			WebVFS.createFile(fileName);
+	private <T>  void  saveTableFile(String tableName,List<T> list) throws  CommonException{
+		try {
+			String fileName = JsonDataSource.class.getClassLoader().getResource("").getPath()+"/"+JsonDataSource.class.getPackage().getName().replaceAll("\\.", "/")+"/"+tableName+".json";
+
+			if( !WebVFS.fileExists(fileName)){
+				WebVFS.createFile(fileName);
+			}
+			WebVFS.writerTextFileContent(fileName, JSONArray.fromObject(list).toString(), "UTF-8");
+		} catch (Exception e) {
+			throw CommonException.parseException(e);
 		}
-		WebVFS.writerTextFileContent(fileName, JSONArray.fromObject(list).toString(), "UTF-8");
 	}
 	
 }

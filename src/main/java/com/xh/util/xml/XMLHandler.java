@@ -65,7 +65,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 import com.xh.util.Utils;
 import com.xh.util.vfs.WebVFS;
 
@@ -516,11 +516,11 @@ public class XMLHandler {
 	 *            The filename to load into a document
 	 * @return the Document if all went well, null if an error occurred!
 	 */
-	public static Document loadXMLFile(String filename) throws WebException {
+	public static Document loadXMLFile(String filename) throws CommonException {
 		try {
 			return loadXMLFile(WebVFS.getFileObject(filename));
 		} catch (Exception e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
@@ -531,7 +531,7 @@ public class XMLHandler {
 	 *            The fileObject to load into a document
 	 * @return the Document if all went well, null if an error occured!
 	 */
-	public static Document loadXMLFile(FileObject fileObject) throws WebException {
+	public static Document loadXMLFile(FileObject fileObject) throws CommonException {
 		return loadXMLFile(fileObject, null, false, false);
 	}
 
@@ -549,11 +549,11 @@ public class XMLHandler {
 	 * @return the Document if all went well, null if an error occured!
 	 */
 	public static Document loadXMLFile(FileObject fileObject, String systemID, boolean ignoreEntities,
-			boolean namespaceAware) throws WebException {
+			boolean namespaceAware) throws CommonException {
 		try {
 			return loadXMLFile(WebVFS.getInputStream(fileObject), systemID, ignoreEntities, namespaceAware);
 		} catch (IOException e) {
-			throw new WebException("Unable to read file [" + fileObject.toString() + "]", e);
+			throw new CommonException("Unable to read file [" + fileObject.toString() + "]", e);
 		}
 	}
 
@@ -565,7 +565,7 @@ public class XMLHandler {
 	 *            The filename input stream to read the document from
 	 * @return the Document if all went well, null if an error occurred!
 	 */
-	public static Document loadXMLFile(InputStream inputStream) throws WebException {
+	public static Document loadXMLFile(InputStream inputStream) throws CommonException {
 		return loadXMLFile(inputStream, null, false, false);
 	}
 
@@ -583,7 +583,7 @@ public class XMLHandler {
 	 * @return the Document if all went well, null if an error occured!
 	 */
 	public static Document loadXMLFile(InputStream inputStream, String systemID, boolean ignoreEntities,
-			boolean namespaceAware) throws WebException {
+			boolean namespaceAware) throws CommonException {
 		try {
 			// Check and open XML document
 			//
@@ -623,7 +623,7 @@ public class XMLHandler {
 					doc = db.parse(inputStream, systemIDwithEndingSlash);
 				}
 			} catch (FileNotFoundException ef) {
-				throw new WebException(ef);
+				throw new CommonException(ef);
 			} finally {
 				if (inputStream != null) {
 					inputStream.close();
@@ -633,15 +633,15 @@ public class XMLHandler {
 			return doc;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new WebException("Error reading information from input stream", e);
+			throw new CommonException("Error reading information from input stream", e);
 		}
 	}
 
-	public static Document loadXMLFile(File resource) throws WebException {
+	public static Document loadXMLFile(File resource) throws CommonException {
 		try {
 			return loadXMLFile(resource.toURI().toURL());
 		} catch (MalformedURLException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
@@ -652,7 +652,7 @@ public class XMLHandler {
 	 *            The resource to load into a document
 	 * @return the Document if all went well, null if an error occured!
 	 */
-	public static Document loadXMLFile(URL resource) throws WebException {
+	public static Document loadXMLFile(URL resource) throws CommonException {
 		DocumentBuilderFactory dbf;
 		DocumentBuilder db;
 		Document doc;
@@ -665,14 +665,14 @@ public class XMLHandler {
 			try {
 				doc = db.parse(inputStream);
 			} catch (IOException ef) {
-				throw new WebException(ef);
+				throw new CommonException(ef);
 			} finally {
 				inputStream.close();
 			}
 
 			return doc;
 		} catch (Exception e) {
-			throw new WebException("Error reading information from resource", e);
+			throw new CommonException("Error reading information from resource", e);
 		}
 	}
 
@@ -681,9 +681,9 @@ public class XMLHandler {
 	 *
 	 * @param string
 	 * @return
-	 * @throws WebException
+	 * @throws CommonException
 	 */
-	public static Document loadXMLString(String string) throws WebException {
+	public static Document loadXMLString(String string) throws CommonException {
 
 		return loadXMLString(string, Boolean.FALSE, Boolean.TRUE);
 
@@ -697,10 +697,10 @@ public class XMLHandler {
 	 * @param tag
 	 *            the node to return
 	 * @return the requested node
-	 * @throws WebException
+	 * @throws CommonException
 	 *             in case there is a problem reading the XML
 	 */
-	public static Node loadXMLString(String xml, String tag) throws WebException {
+	public static Node loadXMLString(String xml, String tag) throws CommonException {
 		Document doc = loadXMLString(xml);
 		return getSubNode(doc, tag);
 	}
@@ -715,12 +715,12 @@ public class XMLHandler {
 	 * @return the Document if all went well, null if an error occurred!
 	 */
 	public static Document loadXMLString(String string, Boolean namespaceAware, Boolean deferNodeExpansion)
-			throws WebException {
+			throws CommonException {
 		DocumentBuilder db = createDocumentBuilder(namespaceAware, deferNodeExpansion);
 		return loadXMLString(db, string);
 	}
 
-	public static Document loadXMLString(DocumentBuilder db, String string) throws WebException {
+	public static Document loadXMLString(DocumentBuilder db, String string) throws CommonException {
 
 		try {
 			StringReader stringReader = new java.io.StringReader(string);
@@ -730,26 +730,26 @@ public class XMLHandler {
 			try {
 				doc = db.parse(inputSource);
 			} catch (IOException ef) {
-				throw new WebException("Error parsing XML", ef);
+				throw new CommonException("Error parsing XML", ef);
 			} finally {
 				stringReader.close();
 			}
 
 			return doc;
 		} catch (Exception e) {
-			throw new WebException("Error reading information from XML string : " + Utils.CR + string, e);
+			throw new CommonException("Error reading information from XML string : " + Utils.CR + string, e);
 		}
 	}
 
 	public static DocumentBuilder createDocumentBuilder(boolean namespaceAware, boolean deferNodeExpansion)
-			throws WebException {
+			throws CommonException {
 		try {
 			DocumentBuilderFactory dbf = XMLParserFactoryProducer.createSecureDocBuilderFactory();
 			dbf.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", deferNodeExpansion);
 			dbf.setNamespaceAware(namespaceAware);
 			return dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
@@ -1117,10 +1117,10 @@ public class XMLHandler {
 	 * @param string
 	 *            the (Byte64/GZip) encoded string
 	 * @return the decoded binary (byte[]) object
-	 * @throws WebException
+	 * @throws CommonException
 	 *             In case there is a decoding error
 	 */
-	public static byte[] stringToBinary(String string) throws WebException {
+	public static byte[] stringToBinary(String string) throws CommonException {
 		try {
 			byte[] bytes;
 			if (string == null) {
@@ -1158,7 +1158,7 @@ public class XMLHandler {
 
 			return bytes;
 		} catch (Exception e) {
-			throw new WebException("Error converting string to binary", e);
+			throw new CommonException("Error converting string to binary", e);
 		}
 	}
 
@@ -1186,14 +1186,14 @@ public class XMLHandler {
 		return builder.append("</").append(tag).append('>');
 	}
 
-	public static String formatNode(Node node) throws WebException {
+	public static String formatNode(Node node) throws CommonException {
 		StringWriter sw = new StringWriter();
 		try {
 			Transformer t = TransformerFactory.newInstance().newTransformer();
 			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			t.transform(new DOMSource(node), new StreamResult(sw));
 		} catch (Exception e) {
-			throw new WebException("Unable to format Node as XML", e);
+			throw new CommonException("Unable to format Node as XML", e);
 		}
 		return sw.toString();
 	}

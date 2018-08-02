@@ -46,7 +46,8 @@ import org.apache.commons.vfs2.cache.WeakRefFilesCache;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.commons.vfs2.provider.local.LocalFile;
-import com.xh.common.exception.WebException;
+
+import com.xh.common.CommonException;
 import com.xh.util.Utils;
 
 public class WebVFS {
@@ -98,20 +99,20 @@ public class WebVFS {
 		return webVFS;
 	}
 
-	public static FileObject getFileObject(String vfsFilename) throws WebException {
+	public static FileObject getFileObject(String vfsFilename) throws CommonException {
 		return getFileObject(vfsFilename, defaultProperties);
 	}
 
-	public static FileObject getFileObject(String vfsFilename, Properties space) throws WebException {
+	public static FileObject getFileObject(String vfsFilename, Properties space) throws CommonException {
 		return getFileObject(vfsFilename, space, null);
 	}
 
-	public static FileObject getFileObject(String vfsFilename, FileSystemOptions fsOptions) throws WebException {
+	public static FileObject getFileObject(String vfsFilename, FileSystemOptions fsOptions) throws CommonException {
 		return getFileObject(vfsFilename, defaultProperties, fsOptions);
 	}
 
 	public static FileObject getFileObject(String vfsFilename, Properties space, FileSystemOptions fsOptions)
-			throws WebException {
+			throws CommonException {
 		try {
 			FileSystemManager fsManager = getInstance().getFileSystemManager();
 
@@ -159,7 +160,7 @@ public class WebVFS {
 
 			return fileObject;
 		} catch (IOException e) {
-			throw new WebException("Unable to get VFS File object for filename '" + cleanseFilename(vfsFilename)
+			throw new CommonException("Unable to get VFS File object for filename '" + cleanseFilename(vfsFilename)
 					+ "' : " + e.getMessage());
 		}
 	}
@@ -201,19 +202,19 @@ public class WebVFS {
 		return fsOptions;
 	}
 	
-	public static void writerTextFileContent(String vfsFilename,String content,String charSetName) throws Exception {
+	public static void writerTextFileContent(String vfsFilename,String content,String charSetName) throws CommonException {
 		saveTextFileContent(vfsFilename, null, false, content, charSetName);
 	}
 
-	public static void appendTextFileContent(String vfsFilename,String content,String charSetName) throws Exception {
+	public static void appendTextFileContent(String vfsFilename,String content,String charSetName) throws CommonException {
 		saveTextFileContent(vfsFilename, null, true, content, charSetName);
 	}
 	
-	public static void saveTextFileContent(String vfsFilename, Boolean append ,String content,String charSetName) throws Exception {
+	public static void saveTextFileContent(String vfsFilename, Boolean append ,String content,String charSetName) throws CommonException {
 		saveTextFileContent(vfsFilename, null, append, content, charSetName);
 	}
 	
-	public static void saveTextFileContent(String vfsFilename, Properties space, Boolean append ,String content,String charSetName) throws Exception {
+	public static void saveTextFileContent(String vfsFilename, Properties space, Boolean append ,String content,String charSetName) throws CommonException {
 		OutputStreamWriter writer =null;
 		OutputStream outputStream = null;
 		try {
@@ -230,13 +231,16 @@ public class WebVFS {
 			}
 			writer.flush();
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}finally{
-			if( writer != null ){
-				writer.close();
-			}
-			if( outputStream != null ){
-				outputStream.close();
+			try {
+				if( writer != null ){
+					writer.close();
+				}
+				if( outputStream != null ){
+					outputStream.close();
+				}
+			} catch (IOException e) {
 			}
 		}
 	}
@@ -252,12 +256,12 @@ public class WebVFS {
 	 * @return The content of the file as a String
 	 * @throws IOException
 	 */
-	public static String getTextFileContent(String vfsFilename, String charSetName) throws WebException {
+	public static String getTextFileContent(String vfsFilename, String charSetName) throws CommonException {
 		return getTextFileContent(vfsFilename, null, charSetName);
 	}
 
 	public static String getTextFileContent(String vfsFilename, Properties space, String charSetName)
-			throws WebException {
+			throws CommonException {
 		try {
 			InputStream inputStream = null;
 
@@ -277,21 +281,21 @@ public class WebVFS {
 
 			return aBuffer.toString();
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
-	public static boolean fileExists(String vfsFilename) throws WebException {
+	public static boolean fileExists(String vfsFilename) throws CommonException {
 		return fileExists(vfsFilename, null);
 	}
 
-	public static boolean fileExists(String vfsFilename, Properties space) throws WebException {
+	public static boolean fileExists(String vfsFilename, Properties space) throws CommonException {
 		FileObject fileObject = null;
 		try {
 			fileObject = getFileObject(vfsFilename, space);
 			return fileObject.exists();
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		} finally {
 			if (fileObject != null) {
 				try {
@@ -307,17 +311,17 @@ public class WebVFS {
 		return content.getInputStream();
 	}
 
-	public static InputStream getInputStream(String vfsFilename) throws WebException {
+	public static InputStream getInputStream(String vfsFilename) throws CommonException {
 		return getInputStream(vfsFilename, defaultProperties);
 	}
 
-	public static InputStream getInputStream(String vfsFilename, Properties space) throws WebException {
+	public static InputStream getInputStream(String vfsFilename, Properties space) throws CommonException {
 		try {
 			FileObject fileObject = getFileObject(vfsFilename, space);
 
 			return getInputStream(fileObject);
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
@@ -349,27 +353,27 @@ public class WebVFS {
 		}
 	}
 
-	public static OutputStream getOutputStream(String vfsFilename, boolean append) throws WebException {
+	public static OutputStream getOutputStream(String vfsFilename, boolean append) throws CommonException {
 		return getOutputStream(vfsFilename, defaultProperties, append);
 	}
 
 	public static OutputStream getOutputStream(String vfsFilename, Properties space, boolean append)
-			throws WebException {
+			throws CommonException {
 		try {
 			FileObject fileObject = getFileObject(vfsFilename, space);
 			return getOutputStream(fileObject, append);
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
 	public static OutputStream getOutputStream(String vfsFilename, Properties space, FileSystemOptions fsOptions,
-			boolean append) throws WebException {
+			boolean append) throws CommonException {
 		try {
 			FileObject fileObject = getFileObject(vfsFilename, space, fsOptions);
 			return getOutputStream(fileObject, append);
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 
@@ -403,7 +407,7 @@ public class WebVFS {
 		String friendlyName;
 		try {
 			friendlyName = getFriendlyURI(WebVFS.getFileObject(filename));
-		} catch (Exception e) {
+		} catch (CommonException e) {
 			// unable to get a friendly name from VFS object.
 			// Cleanse name of pwd before returning
 			friendlyName = cleanseFilename(filename);
@@ -415,24 +419,32 @@ public class WebVFS {
 		return fileObject.getName().getFriendlyURI();
 	}
 	
-	public static void createFile(String filename) throws Exception{
-		 FileObject fileObject = getFileObject(filename);
-		 fileObject.createFile();
-		 fileObject.close();
+	public static void createFile(String filename) throws CommonException{
+		 try {
+			FileObject fileObject = getFileObject(filename);
+			 fileObject.createFile();
+			 fileObject.close();
+		} catch (FileSystemException e) {
+			throw CommonException.parseException(e);
+		}
 	}
 	
-	public static void createFolder(String filename) throws Exception{
-		 FileObject fileObject = getFileObject(filename);
-		 fileObject.createFolder();
-		 fileObject.close();
+	public static void createFolder(String filename) throws CommonException{
+		 try {
+			FileObject fileObject = getFileObject(filename);
+			 fileObject.createFolder();
+			 fileObject.close();
+		} catch (FileSystemException e) {
+			throw CommonException.parseException(e);
+		}
 	}
 
-	public static FileObject createTempFile(String prefix, String suffix, String directory) throws WebException {
+	public static FileObject createTempFile(String prefix, String suffix, String directory) throws CommonException {
 		return createTempFile(prefix, suffix, directory, null);
 	}
 
 	public static FileObject createTempFile(String prefix, String suffix, String directory, Properties space)
-			throws WebException {
+			throws CommonException {
 		try {
 			FileObject fileObject;
 			do {
@@ -449,7 +461,7 @@ public class WebVFS {
 			} while (fileObject.exists());
 			return fileObject;
 		} catch (IOException e) {
-			throw new WebException(e);
+			throw new CommonException(e);
 		}
 	}
 

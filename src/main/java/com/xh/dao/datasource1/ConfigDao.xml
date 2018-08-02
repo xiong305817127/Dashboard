@@ -6,7 +6,7 @@
 	<!-- ######        增加                      ###### -->
 	<!-- ############################## -->
 	
-	<insert id="addConfig" parameterType="com.xh.entry.Config">
+	<insert id="addConfig" parameterType="com.xh.dto.ConfigDto">
 		insert into
 		config(`key`,`value`,createTime)
 		value(#{key},#{value},#{createTime})
@@ -16,7 +16,7 @@
 	<!-- ######       删除                         ###### -->
 	<!-- ############################## -->
 		
-	<delete id="deleteConfig" parameterType="com.xh.entry.Config">
+	<delete id="deleteConfig" parameterType="com.xh.dto.ConfigDto">
 		delete from config where `key`=#{key}
 	</delete>
 	
@@ -24,7 +24,7 @@
 	<!-- ######       修改                         ###### -->
 	<!-- ############################## -->
 	
-	<update id="updateConfig" parameterType="com.xh.entry.Config">
+	<update id="updateConfig" parameterType="com.xh.dto.ConfigDto">
 		update config set value=#{value}
 		where `key`=#{key}
 	</update>
@@ -33,7 +33,7 @@
 	<!-- ######       查询                         ###### -->
 	<!-- ############################## -->
 		
-	<select id="getConfigByKey" resultType="com.xh.entry.Config">
+	<select id="getConfigByKey" resultType="com.xh.dto.ConfigDto">
 		select * from config where `key`=#{key}
 	</select>
 </mapper>  

@@ -2,25 +2,26 @@ package com.xh.service.user;
 
 import java.util.List;
 
-import com.xh.common.dto.PaginationDto;
-import com.xh.entry.User;
+import com.xh.common.CommonException;
+import com.xh.dto.UserDto;
+import com.xh.dto.common.PaginationDto;
 
 public interface UserService {
 
-	public User addUser(User user) throws Exception;
+	public UserDto addUser(UserDto user) throws CommonException;
 
-	public User deleteUserById(String key) throws Exception;
+	public UserDto deleteUserById(String key) throws CommonException;
 	
-	public void deleteUserByIds(List<String> id) throws Exception ;
+	public void deleteUserByIds(List<String> id) throws CommonException ;
 
-	public User updateUserById(String id ,User user) throws Exception;
+	public UserDto updateUserById(String id ,UserDto user) throws CommonException;
 
-	public User getUserById(String id) throws Exception;
+	public UserDto getUserById(String id) throws CommonException;
 	
-	public User getUserByUserName(String UserName) throws Exception;
+	public UserDto getUserByUserName(String UserName) throws CommonException;
 
-	public List<User> getUserList() throws Exception;
+	public List<UserDto> getUserList() throws CommonException;
 	
-	public PaginationDto<User> getUserList(Integer page,Integer pageSize,String search) throws Exception;
+	public PaginationDto<UserDto> getUserList(Integer page,Integer pageSize,String search) throws CommonException;
 
 }

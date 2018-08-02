@@ -7,9 +7,9 @@ import javax.annotation.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.xh.common.service.BaseService;
 import com.xh.dao.datasource1.ConfigDao;
-import com.xh.entry.Config;
+import com.xh.dto.ConfigDto;
+import com.xh.service.common.BaseService;
 
 /**
  * 网站配置
@@ -30,10 +30,10 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 * 
 	 * @param key
 	 * @param value
-	 * @return Config
+	 * @return ConfigDto
 	 */
-	public Config addConfig(String key, String value) {
-		Config config = new Config();
+	public ConfigDto addConfig(String key, String value) {
+		ConfigDto config = new ConfigDto();
 		config.setKey(key);
 		config.setValue(value);
 		config.setCreateTime(new Date());
@@ -57,11 +57,11 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 * @param key
 	 * @param value
 	 */
-	public Config updateConfigByKey(String key, String value) {
-		Config config = configDao.getConfigByKey(key);
+	public ConfigDto updateConfigByKey(String key, String value) {
+		ConfigDto config = configDao.getConfigByKey(key);
 		config.setValue(value);
 		configDao.updateConfig(config);
-		Config config2 = configDao.getConfigByKey(key);
+		ConfigDto config2 = configDao.getConfigByKey(key);
 		config2.setValue(value);
 		configDao.updateConfig(config2);
 		this.getStringByKey(key);
@@ -74,7 +74,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 */
 	@Cacheable(value="commonCache")
 	public String getStringByKey(String key) {
-		Config config = configDao.getConfigByKey(key);
+		ConfigDto config = configDao.getConfigByKey(key);
 		if (config == null) {
 			return "";
 		} else {
@@ -87,7 +87,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService{
 	 * @return
 	 */
 	public int getIntKey(String key) {
-		Config config = configDao.getConfigByKey(key);
+		ConfigDto config = configDao.getConfigByKey(key);
 		if (config == null) {
 			return 0;
 		} else {

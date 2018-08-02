@@ -7,12 +7,13 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.xh.common.dto.PaginationDto;
-import com.xh.common.exception.WebException;
-import com.xh.common.service.BaseService;
+import com.xh.common.CommonException;
 import com.xh.dao.jsondatasource.PermissionDao;
 import com.xh.dao.jsondatasource.UserDao;
-import com.xh.entry.User;
+import com.xh.dto.UserDto;
+import com.xh.dto.common.PaginationDto;
+import com.xh.service.common.BaseService;
+import com.xh.service.common.ServiceException;
 import com.xh.util.Utils;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -32,17 +33,17 @@ public class UserServiceImpl extends BaseService implements UserService {
 	private PermissionDao permissionDao;
 
 	@Override
-	public User addUser(User user) throws Exception {
+	public UserDto addUser(UserDto user) throws CommonException {
 		if(user ==null || Utils.isEmpty(user.getUsername())){
-			throw new WebException(" user name cannot be empty !");
+			throw new ServiceException(" user name cannot be empty !");
 		}
-		User oldUser = null;
+		UserDto oldUser = null;
 		try{
 			oldUser = getUserByUserName(user.getUsername());
-		}catch(Exception e){
+		}catch(CommonException e){
 		}
 		if(oldUser != null){
-			throw new WebException(" user "+user.getUsername()+" already exists !");
+			throw new ServiceException(" user "+user.getUsername()+" already exists !");
 		}
 		
 		user.setId( ( userDao.getMaxId()+1 )+"");
@@ -90,23 +91,23 @@ public class UserServiceImpl extends BaseService implements UserService {
 	}
 	
 	@Override
-	public User deleteUserById(String id) throws Exception {
-		User oldUser = getUserById(id);
+	public UserDto deleteUserById(String id) throws CommonException {
+		UserDto oldUser = getUserById(id);
 		if ("admin".equals(oldUser.getUsername())) {
-			throw new WebException(" user admin is cannot be deleted ");
+			throw new ServiceException(" user admin is cannot be deleted ");
 		}
 		return userDao.deleteUser(id);
 	}
 
 	@Override
-	public void deleteUserByIds(List<String> ids) throws Exception {
+	public void deleteUserByIds(List<String> ids) throws CommonException {
 		if (ids == null || ids.size() == 0) {
 			return;
 		}
 		if (getAdminIds().stream().filter(id -> {
 			return ids.contains(id);
 		}).findAny().isPresent()) {
-			throw new WebException(" user admin is cannot be deleted  ");
+			throw new ServiceException(" user admin is cannot be deleted  ");
 		}
 
 		for (String id : ids) {
@@ -114,16 +115,16 @@ public class UserServiceImpl extends BaseService implements UserService {
 		}
 	}
 
-	private List<String> getAdminIds() throws Exception {
-		User admin = getUserByUserName("admin");
+	private List<String> getAdminIds() throws CommonException {
+		UserDto admin = getUserByUserName("admin");
 		return Utils.newArrayList(admin.getId());
 
 	}
 
 	@Override
-	public User updateUserById(String id, User user) throws Exception {
+	public UserDto updateUserById(String id, UserDto user) throws CommonException {
 
-		User oldUser = getUserById(id);
+		UserDto oldUser = getUserById(id);
 		if ("admin".equals(oldUser.getUsername())) {
 			user.setPermissionId("admin");
 		}
@@ -131,35 +132,35 @@ public class UserServiceImpl extends BaseService implements UserService {
 		return userDao.updateUser(oldUser);
 	}
 
-	public User getUserById(String id) throws Exception {
+	public UserDto getUserById(String id) throws CommonException {
 		return userDao.getUserById(id);
 	}
 
 	@Override
-	public User getUserByUserName(String userName) throws Exception {
+	public UserDto getUserByUserName(String userName) throws CommonException {
 		return userDao.getUserByUserName(userName);
 	}
 
 	@Override
-	public List<User> getUserList() throws Exception {
+	public List<UserDto> getUserList() throws CommonException {
 		return userDao.getUserList();
 	}
 	
 
-	public PaginationDto<User> getUserList(Integer page, Integer pageSize, String search) throws Exception {
+	public PaginationDto<UserDto> getUserList(Integer page, Integer pageSize, String search) throws CommonException {
 
-		PaginationDto<User> result = new PaginationDto<User>(page, pageSize, search);
-		List<User> listAll = getUserList();
-		result.processingDataPaging(listAll, new PaginationDto.DealRowsInterface<User>() {
+		PaginationDto<UserDto> result = new PaginationDto<UserDto>(page, pageSize, search);
+		List<UserDto> listAll = getUserList();
+		result.processingDataPaging(listAll, new PaginationDto.DealRowsInterface<UserDto>() {
 
 			@Override
-			public User dealRow(Object obj) throws Exception {
-				return (User) obj;
+			public UserDto dealRow(Object obj) throws CommonException {
+				return (UserDto) obj;
 			}
 
 			@Override
 			public boolean match(Object obj, String search) {
-				User u = (User) obj;
+				UserDto u = (UserDto) obj;
 				return defaultMatch(u.getUsername(), search);
 			}
 		});

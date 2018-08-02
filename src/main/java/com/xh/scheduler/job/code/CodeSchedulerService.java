@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 import com.xh.scheduler.job.JobService;
 import com.xh.scheduler.vo.SchedulerVo;
 
@@ -19,7 +19,7 @@ public class CodeSchedulerService extends JobService{
 	
 	//get_XXX_parent
 	//返回list 为 子任务的服务参数 AppServiceImpl.getAirMapByDeviceIdAndLimit(String deviceId, String unit, Integer isCheck,String limit)
-	public List<List<Object>> parentDataResponse(List<String> devices,CodeJobParam t,SchedulerVo svo) throws WebException{
+	public List<List<Object>> parentDataResponse(List<String> devices,CodeJobParam t,SchedulerVo svo) throws CommonException{
 		if(devices!= null &&devices.size()>0) {
 			
 			String extendedUnit= svo.getInitValue("extended_Table_unit","air_minute");
@@ -42,7 +42,7 @@ public class CodeSchedulerService extends JobService{
 	
 	//detecting_alarm_data_child
 	//获取到了单个设备的待处理数据列表，进行处理
-	public Integer childDataResponse(List<Map<String,Object>> airMapList,CodeJobParam t,SchedulerVo svo) throws WebException{
+	public Integer childDataResponse(List<Map<String,Object>> airMapList,CodeJobParam t,SchedulerVo svo) throws CommonException{
 		
 		String extendedUnit= svo.getInitValue("extended_Table_unit","air_minute");
 		

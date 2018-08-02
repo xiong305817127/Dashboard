@@ -69,7 +69,8 @@ import org.safehaus.uuid.EthernetAddress;
 import org.safehaus.uuid.UUID;
 import org.safehaus.uuid.UUIDGenerator;
 
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
+
 
 /* Levenshtein in Java, originally from Josh Drew's code at
  * http://joshdrew.com/
@@ -960,17 +961,20 @@ public class Utils {
 	 *
 	 * @return The IP address
 	 */
-	public static String getIPAddress() throws Exception {
-		Enumeration<NetworkInterface> enumInterfaces = NetworkInterface.getNetworkInterfaces();
-		while (enumInterfaces.hasMoreElements()) {
-			NetworkInterface nwi = enumInterfaces.nextElement();
-			Enumeration<InetAddress> ip = nwi.getInetAddresses();
-			while (ip.hasMoreElements()) {
-				InetAddress in = ip.nextElement();
-				if (!in.isLoopbackAddress() && in.toString().indexOf(":") < 0) {
-					return in.getHostAddress();
+	public static String getIPAddress() throws CommonException {
+		try {
+			Enumeration<NetworkInterface> enumInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (enumInterfaces.hasMoreElements()) {
+				NetworkInterface nwi = enumInterfaces.nextElement();
+				Enumeration<InetAddress> ip = nwi.getInetAddresses();
+				while (ip.hasMoreElements()) {
+					InetAddress in = ip.nextElement();
+					if (!in.isLoopbackAddress() && in.toString().indexOf(":") < 0) {
+						return in.getHostAddress();
+					}
 				}
 			}
+		} catch (SocketException e) {
 		}
 		return "127.0.0.1";
 	}
@@ -1004,7 +1008,7 @@ public class Utils {
 	 *
 	 * @return The MAC address.
 	 */
-	public static String getMACAddress() throws Exception {
+	public static String getMACAddress() throws CommonException {
 		String ip = getIPAddress();
 		String mac = "none";
 		String os = getOS();
@@ -1093,7 +1097,7 @@ public class Utils {
 					}
 				}
 				stdInput.close();
-			} catch (Exception e) {
+			} catch ( Exception e) {
 				errorOccured = true;
 
 			}
@@ -1804,15 +1808,15 @@ public class Utils {
 	/**
 	 * @return a new ClassLoader
 	 */
-	public static ClassLoader createNewClassLoader() throws WebException {
+	public static ClassLoader createNewClassLoader() throws CommonException {
 		try {
 			// Nothing really in URL, everything is in scope.
 			URL[] urls = new URL[] {};
 			URLClassLoader ucl = new URLClassLoader(urls);
 
 			return ucl;
-		} catch (Exception e) {
-			throw new WebException("Unexpected error during classloader creation", e);
+		} catch ( Exception e) {
+			throw new CommonException("Unexpected error during classloader creation", e);
 		}
 	}
 
@@ -2258,7 +2262,7 @@ public class Utils {
 	 *            the time format
 	 * @return date = input + time
 	 */
-	public static Date addTimeToDate(Date input, String time, String DateFormat) throws Exception {
+	public static Date addTimeToDate(Date input, String time, String DateFormat) throws CommonException {
 		if (Utils.isEmpty(time)) {
 			return input;
 		}
@@ -2272,7 +2276,7 @@ public class Utils {
 
 	// Decodes a time value in specified date format and returns it as
 	// milliseconds since midnight.
-	public static int decodeTime(String s, String DateFormat) throws Exception {
+	public static int decodeTime(String s, String DateFormat) throws CommonException {
 		SimpleDateFormat f = new SimpleDateFormat(DateFormat);
 		TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
 		f.setTimeZone(utcTimeZone);
@@ -2280,7 +2284,7 @@ public class Utils {
 		ParsePosition p = new ParsePosition(0);
 		Date d = f.parse(s, p);
 		if (d == null) {
-			throw new Exception("Invalid time value " + DateFormat + ": \"" + s + "\".");
+			throw new CommonException("Invalid time value " + DateFormat + ": \"" + s + "\".");
 		}
 		return (int) d.getTime();
 	}
@@ -2575,7 +2579,7 @@ public class Utils {
 				try {
 					com.ccg.net.ethernet.EthernetAddress ea = com.ccg.net.ethernet.EthernetAddress.getPrimaryAdapter();
 					eAddr = new org.safehaus.uuid.EthernetAddress(ea.getBytes());
-				} catch (Exception ex) {
+				} catch ( Exception ex) {
 					nativeInitialized = false;
 				}
 			}
@@ -2616,7 +2620,7 @@ public class Utils {
 		return ug.generateTimeBasedUUID(eAddr);
 	}
 	
-	public static <T> List<T> transListToList(List<?> sources, DtoTransData<T> dtd) throws Exception {
+	public static <T> List<T> transListToList(List<?> sources, DtoTransData<T> dtd) throws CommonException {
 		if (sources == null || sources.size() == 0) {
 			return Utils.newArrayList();
 		}
@@ -2627,7 +2631,7 @@ public class Utils {
 		return result;
 	}
 	
-	public static <T> List<T> transArrayToList(Object[] sources,DtoTransData<T> dtd) throws Exception{
+	public static <T> List<T> transArrayToList(Object[] sources,DtoTransData<T> dtd) throws CommonException{
 		if(sources ==null || sources.length ==0){
 			return Utils.newArrayList();
 		}
@@ -2640,7 +2644,7 @@ public class Utils {
 
 	public interface DtoTransData<T> {
 
-		T dealData(Object obj, int index) throws Exception ;
+		T dealData(Object obj, int index) throws CommonException ;
 
 	}
 	

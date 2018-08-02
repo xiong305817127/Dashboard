@@ -4,9 +4,9 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.xh.common.service.BaseService;
+import com.xh.common.CommonException;
 import com.xh.dto.UserDto;
-import com.xh.entry.User;
+import com.xh.service.common.BaseService;
 import com.xh.service.user.UserService;
 
 /**
@@ -22,9 +22,9 @@ public class LoginServiceImpl extends BaseService implements LoginService{
 	private UserService userService;
 
 	@Override
-	public UserDto login(UserDto userOld) throws Exception {
+	public UserDto login(UserDto userOld) throws CommonException {
 		
-		 User userNew = userService.getUserByUserName(userOld.getUsername());
+		 UserDto userNew = userService.getUserByUserName(userOld.getUsername());
 		 if(userOld.getPassword().equals(userNew.getPassword())){
 			 return (UserDto)updateObjectToBean(userNew, userOld);
 		 }
@@ -33,7 +33,7 @@ public class LoginServiceImpl extends BaseService implements LoginService{
 	}
 
 	@Override
-	public void logout() throws Exception {
+	public void logout() throws CommonException {
 		
 	}
 

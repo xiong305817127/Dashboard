@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+	         http://www.springframework.org/schema/lang
+	         http://www.springframework.org/schema/lang/spring-lang.xsd      
+	         http://www.springframework.org/schema/tx   
+	         http://www.springframework.org/schema/tx/spring-tx.xsd    
+	         http://www.springframework.org/schema/aop     
+	         http://www.springframework.org/schema/aop/spring-aop.xsd    
+	         http://www.springframework.org/schema/mvc     
+	         http://www.springframework.org/schema/mvc/spring-mvc.xsd   
+	         http://www.springframework.org/schema/context     
+	         http://www.springframework.org/schema/context/spring-context.xsd
+	         http://www.springframework.org/schema/cache
+	         http://www.springframework.org/schema/cache/spring-cache.xsd
+	         http://www.springframework.org/schema/task 
+	         http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<context:property-placeholder location="classpath*:/config.properties" ignore-resource-not-found="true" ignore-unresolvable="true" />
+
+	<!--xml 配置 -->
+	<import resource="classpath:spring/jdbc.xml" />
+	<import resource="classpath:spring/websocket.xml" />
+	<import resource="classpath:spring/webservice.xml" />
+	
+	<!-- 自动扫描的包名 -->
+	<context:component-scan base-package="com.xh.dao" />
+	<context:component-scan base-package="com.xh.ext" />
+	<context:component-scan base-package="com.xh.scheduler" />
+	<context:component-scan base-package="com.xh.service" />
+
+	<context:annotation-config />
+
+	<task:annotation-driven />
+
+	<bean class="com.xh.ext.CloudServiceAspect" />
+	<bean class="com.xh.util.SpringUtil"/>
+
+  	 <!-- spring自己的缓存管理器，这里定义了缓存位置名称 ，即注解中的value  
+  	   @Cacheable spring
+	             会在其被调用后将返回值缓存起来，以保证下次利用同样的参数来执行该方法时可以直接从缓存中获取结果，而不需要再次执行该方法。<br>
+	   @CachePut 标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。<br>
+	   @CacheEvict 用来标注在需要清除缓存元素的方法或类上的。<br>
+	              <br>
+	              eg. <br>
+	   @Cacheable(key="'id_'+#id") <br>
+	   @CachePut(key="#user.getUserName()") <br>
+	   @CacheEvict(key="'id_'+#id") <br> 
+	  --> 
+     <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">    
+         <property name="caches">    
+            <set>    
+                <!-- 这里可以配置多个redis -->  
+                <bean class="org.springframework.cache.concurrent.ConcurrentMapCache">  
+                	<constructor-arg > 
+                		<value>sampleCache</value>   
+                	</constructor-arg>  
+                </bean>    
+            </set>    
+         </property>    
+     </bean>   
+	
+	<!-- 启用缓存注解功能，这个是必须的，否则注解不会生效，另外，该注解一定要声明在spring主配置文件中才会生效 -->    
+    <cache:annotation-driven cache-manager="cacheManager" />
+
+</beans>

@@ -30,7 +30,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
+
 
 public class XMLCheck {
 
@@ -45,12 +46,12 @@ public class XMLCheck {
    *          The file to check
    * @return true if the file is well formed.
    */
-  public static final boolean isXMLFileWellFormed( FileObject file ) throws WebException {
+  public static final boolean isXMLFileWellFormed( FileObject file ) throws CommonException {
     boolean retval = false;
     try {
       retval = isXMLWellFormed( file.getContent().getInputStream() );
     } catch ( Exception e ) {
-      throw new WebException( e );
+      throw new CommonException( e );
     }
 
     return retval;
@@ -63,7 +64,7 @@ public class XMLCheck {
    *          inputstream
    * @return true if the xml is well formed.
    */
-  public static boolean isXMLWellFormed( InputStream is ) throws WebException {
+  public static boolean isXMLWellFormed( InputStream is ) throws CommonException {
     boolean retval = false;
     try {
       SAXParserFactory factory = XMLParserFactoryProducer.createSecureSAXParserFactory();
@@ -74,7 +75,7 @@ public class XMLCheck {
       saxParser.parse( is, handler );
       retval = true;
     } catch ( Exception e ) {
-      throw new WebException( e );
+      throw new CommonException( e );
     }
     return retval;
   }

@@ -28,7 +28,7 @@ import com.xh.websocket.config.HttpSessionConfigurator;
  * @since 2018年1月25日
  *
  */
-@ServerEndpoint(value = "/ws/webserver",configurator = HttpSessionConfigurator.class)
+@ServerEndpoint(value = "/ws/websocket1",configurator = HttpSessionConfigurator.class)
 public class SocketServerEndpoint {
 	@OnOpen
 	public void onOpen(Session session, EndpointConfig config) throws IOException {

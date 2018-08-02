@@ -9,7 +9,7 @@ package com.xh.dao.datasource2;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.xh.entry.Config;
+import com.xh.dto.ConfigDto;
 
 /**
  * 网站配置
@@ -31,7 +31,7 @@ public interface ConfigDao2 {
 	 * 
 	 * @return Integer
 	 */
-	public int addConfig(Config config);
+	public int addConfig(ConfigDto ConfigDto);
 
 	// ///////////////////////////////
 	// ///// 刪除 ////////
@@ -53,7 +53,7 @@ public interface ConfigDao2 {
 	 * 
 	 * @return Integer
 	 */
-	public int updateConfig(Config config);
+	public int updateConfig(ConfigDto ConfigDto);
 
 	// ///////////////////////////////
 	// ///// 查詢 ////////
@@ -62,7 +62,7 @@ public interface ConfigDao2 {
 	/**
 	 * 查看配置
 	 * 
-	 * @return Config
+	 * @return ConfigDto
 	 */
-	public Config getConfigByKey(@Param("key") String key);
+	public ConfigDto getConfigByKey(@Param("key") String key);
 }

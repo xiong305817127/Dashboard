@@ -14,12 +14,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.http.HttpEntity;
-
-import com.xh.common.dto.CommonDto;
-import com.xh.common.dto.ReturnCodeDto;
+import com.xh.logger.CloudLogUtils;
+import com.xh.logger.CloudLogger;
 
 import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
 
 /**
  * Common aspect providing logger & exception
@@ -41,71 +40,19 @@ public class CloudServiceAspect {
 	private void servicePointcut() {}
 	
 	/**
-	 * 控制器方法切点（包括com.xh.controller的全部包，包括子包）
-	 */
-	@Pointcut("execution(* com.xh.controller..*.*(..)) && !@within(org.springframework.web.bind.annotation.ControllerAdvice)")
-	private void controllerPointcut() {}
-	
-	
-	/**
-	 * 切面：控制器方法调用Before通知
-	 * @param joinPoint
-	 */
-	@Before("controllerPointcut()")
-	public void beforeRequest(JoinPoint joinPoint) {
-		String className = joinPoint.getTarget().getClass().getSimpleName();
-		String methodName = joinPoint.getSignature().getName();
-		Object[] args = joinPoint.getArgs();
-		StringBuilder log = new StringBuilder("");
-		for (Object arg : args) {
-			if(arg!=null ){
-				log.append(((arg instanceof  CommonDto)?JSONObject.fromObject(arg).toString():arg )+ " ,");
-			}else{
-				log.append(arg+ " ,");
-			}
-		}
-		logger.info("请求方法：" + className + "." + methodName + "(" + log.toString() + ")");
-	}
-	
-	/**
-	 * 切面：控制器方法调用AfterReturning通知
-	 * @param returnVal
-	 */
-	@AfterReturning(pointcut = "controllerPointcut()", returning = "returnVal")
-	public void afterResponse(Object returnVal) {
-		logger.info("请求响应：" + (returnVal != null ? returnVal.toString() : "<NULL>"));
-	}
-	
-	/**
-	 * 切面：控制器方法调用Around通知，包装返回值，增加返回代码
-	 * @param proceedingJoinPoint
-	 * @return
-	 * @throws Throwable
-	 */
-	@Around("controllerPointcut()")
-	public Object wrapReturnCode(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-		Object object = proceedingJoinPoint.proceed(); // 返回值用一个Object类型来接收
-		if( object instanceof ReturnCodeDto || object instanceof HttpEntity){
-			return object;
-		}else{
-			return  new ReturnCodeDto(true,object);
-		}
-	}
-	
-	/**
 	 * 切面：服务方法调用Before通知
 	 * @param joinPoint
 	 */
 	@Before("servicePointcut()")
 	public void beforeService(JoinPoint joinPoint) {
-		String className = joinPoint.getTarget().getClass().getSimpleName();
-		String methodName = joinPoint.getSignature().getName();
-		Object[] args = joinPoint.getArgs();
-		StringBuilder log = new StringBuilder("");
-		for (Object arg : args) {
-			log.append(arg + " ");
-		}
-		logger.debug("服务调用：" + className + "." + methodName + "(" + log.toString() + ")");
+//		String className = joinPoint.getTarget().getClass().getSimpleName();
+//		String methodName = joinPoint.getSignature().getName();
+//		Object[] args = joinPoint.getArgs();
+//		StringBuilder log = new StringBuilder("");
+//		for (Object arg : args) {
+//			log.append(arg + " ");
+//		}
+//		logger.debug("服务调用：" + className + "." + methodName + "(" + log.toString() + ")");
 	}
 	
 	/**
@@ -114,9 +61,43 @@ public class CloudServiceAspect {
 	 */
 	@AfterReturning(pointcut = "servicePointcut()", returning = "returnVal")
 	public void afterServiceReturing(Object returnVal) {
-		logger.debug("服务结束：" + (returnVal != null ? returnVal.toString() : "<NULL>"));
+		//logger.debug("服务结束：" + (returnVal != null ? returnVal.toString() : "<NULL>"));
 	}
 
+	@Around("servicePointcut()")
+	public Object wrapReturnCode(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+		
+		Long startTime = System.currentTimeMillis();
+		String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
+		String methodName = proceedingJoinPoint.getSignature().getName();
+		
+		Long number = CloudLogger.Num.getAndIncrement();
+		//服务处理前
+		Object[] args = proceedingJoinPoint.getArgs();
+		StringBuilder logStart = new StringBuilder("服务调用:"+methodName);
+		logStart.append("( ");
+		for (Object arg : args) {
+			if(arg!=null && arg.getClass().getSuperclass() == Object.class && (arg.getClass().getInterfaces() == null|| arg.getClass().getInterfaces().length ==0)){
+				logStart.append((JSONUtils.isObject(arg)?JSONObject.fromObject(arg).toString():arg )+ " ,");
+			}else{
+				logStart.append(arg+ " ,");
+			}
+		}
+		logStart.append(" )");
+		CloudLogger.getInstance().debug(className, number, logStart.toString());
+		
+		//服务处理
+		Object object = proceedingJoinPoint.proceed(); // 返回值用一个Object类型来接收
+		
+		//服务处理后
+		StringBuilder logEnd = new StringBuilder("服务结束:");
+		logEnd.append(",耗时:"+(System.currentTimeMillis() - startTime)+"ms");
+		logEnd.append(object != null ? CloudLogUtils.jsonLog2(object) : "<NULL>");
+		CloudLogger.getInstance().debug(className, number, logEnd.toString());
+		
+		return object;
+	}
+	
 	/**
 	 * 切面：服务方法调用AfterThrowing通知
 	 * @param joinPoint
@@ -124,7 +105,9 @@ public class CloudServiceAspect {
 	 */
 	@AfterThrowing(pointcut = "servicePointcut()", throwing="e")
 	public void afterThrowingForService(JoinPoint joinPoint, Throwable e) {
-		
+		String className = joinPoint.getTarget().getClass().getSimpleName();
+		String methodName = joinPoint.getSignature().getName();
+		CloudLogger.getInstance().error(className, "异常拦截: 服务方法["+methodName+"]抛出[ "+e.getClass().getSimpleName()+"]异常.",e);
 	}
 
 }

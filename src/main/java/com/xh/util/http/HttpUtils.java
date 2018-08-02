@@ -18,7 +18,7 @@ import org.springframework.util.ReflectionUtils;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 import com.xh.util.Utils;
 import com.xh.util.http.callback.HttpCallbackModelListener;
 import com.xh.util.http.callback.HttpCallbackStringListener;
@@ -57,9 +57,9 @@ public class HttpUtils {
 	 * @param urlString
 	 *            请求的url
 	 * @throws IOException
-	 * @throws WebException
+	 * @throws CommonException
 	 */
-	public static String doGet(String urlString,Object params,Map<String,String> headers) throws WebException, IOException {
+	public static String doGet(String urlString,Object params,Map<String,String> headers) throws CommonException {
 		return doGeneralGet(urlString, "GET", params, headers);
 	}
 
@@ -88,9 +88,9 @@ public class HttpUtils {
 	 *            返回的对象
 	 * @param <T>
 	 * @throws IOException
-	 * @throws WebException
+	 * @throws CommonException
 	 */
-	public static <T> List<T> doGet(String urlString, final Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doGet(String urlString, final Class<T> cls,Object params,Map<String,String> headers) throws CommonException {
 		return doGeneralGet(urlString, "GET", cls, params, headers) ;
 	}
 	
@@ -115,7 +115,7 @@ public class HttpUtils {
 					if (listener != null) {
 						listener.onFinish(result);
 					}
-				} catch (WebException | IOException e) {
+				} catch (CommonException  e) {
 					if (listener != null) {
 						// 回调onError()方法
 						listener.onError(e);
@@ -134,9 +134,9 @@ public class HttpUtils {
 	 *            请求的url
 	 * @param method    GET/HEAD/DELETE  
 	 * @throws IOException
-	 * @throws WebException
+	 * @throws CommonException
 	 */
-	public static String doGeneralGet(String urlString,String method ,Object params,Map<String,String> headers) throws WebException, IOException {
+	public static String doGeneralGet(String urlString,String method ,Object params,Map<String,String> headers) throws CommonException {
 		return doConnectionGet(urlString,method,params,headers);
 	}
 
@@ -191,11 +191,11 @@ public class HttpUtils {
 								listener.onFinish( (List<T>)mapper.readValue(result, collectionType));
 							}
 						}else {
-							listener.onError(new WebException("Getting information is not in JSON format:" + result));
+							listener.onError(new CommonException("Getting information is not in JSON format:" + result));
 						}
 					}
 
-				} catch (WebException | IOException e) {
+				} catch (CommonException | IOException e) {
 					if (listener != null) {
 						// 回调onError()方法
 						listener.onError(e);
@@ -217,10 +217,10 @@ public class HttpUtils {
 	 *            返回的对象
 	 * @param <T>
 	 * @throws IOException
-	 * @throws WebException
+	 * @throws CommonException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> List<T> doGeneralGet(String urlString, String method , Class<T> cls,Object params,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doGeneralGet(String urlString, String method , Class<T> cls,Object params,Map<String,String> headers) throws CommonException {
 		String result = doConnectionGet(urlString,method,params,headers);
 		if(!Utils.isEmpty(result)) {
 			
@@ -245,12 +245,20 @@ public class HttpUtils {
 			}
 			
 			if ( result.startsWith("{")) {
-				return  Lists.newArrayList(mapper.readValue(result, cls)); 
+				try {
+					return  Lists.newArrayList(mapper.readValue(result, cls));
+				} catch (IOException e) {
+					throw CommonException.parseException(e);
+				} 
 			}else if ( result.startsWith("[")) {
-				JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
-				return  (List<T>)mapper.readValue(result, collectionType);
+				try {
+					JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+					return  (List<T>)mapper.readValue(result, collectionType);
+				} catch (IOException e) {
+					throw CommonException.parseException(e);
+				}
 			} else {
-				throw new WebException("Getting information is not in JSON format:" + result);
+				throw new CommonException("Getting information is not in JSON format:" + result);
 			}
 		}
 		return null;
@@ -263,11 +271,11 @@ public class HttpUtils {
 	 * @param params   String/Map/Object
 	 * @param headers
 	 * @return
-	 * @throws WebException
+	 * @throws CommonException
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
-	private static String doConnectionGet(String urlString,String method ,Object params,Map<String,String> headers) throws WebException, IOException {
+	private static String doConnectionGet(String urlString,String method ,Object params,Map<String,String> headers) throws CommonException {
 		URL url = null;
 		HttpURLConnection httpURLConnection = null;
 		InputStream is = null;
@@ -335,18 +343,23 @@ public class HttpUtils {
 				}
 				return buffer.toString();
 			} else {
-				throw new WebException("response err code:" + httpURLConnection.getResponseCode());
+				throw new CommonException("response err code:" + httpURLConnection.getResponseCode());
 			}
+		}catch(Exception e) {
+			throw CommonException.parseException(e);
 		} finally {
-			if (bf != null) {
-				bf.close();
-			}
-			if (is != null) {
-				is.close();
-			}
-			if (httpURLConnection != null) {
-				// 释放资源
-				httpURLConnection.disconnect();
+			try {
+				if (bf != null) {
+					bf.close();
+				}
+				if (is != null) {
+					is.close();
+				}
+				if (httpURLConnection != null) {
+					// 释放资源
+					httpURLConnection.disconnect();
+				}
+			} catch (IOException e) {
 			}
 		}
 
@@ -374,9 +387,9 @@ public class HttpUtils {
 	 * @param params
 	 *            参数列表,Map对象为form提交,Object/Array为json提交,剩下对象直接提交
 	 * @throws IOException 
-	 * @throws WebException 
+	 * @throws CommonException 
 	 */
-	public static String doPost(String urlString, Object params,Map<String,String> headers) throws WebException, IOException {
+	public static String doPost(String urlString, Object params,Map<String,String> headers) throws CommonException {
 		return doGeneralPost(urlString, "POST", params, headers);
 	}
 
@@ -412,9 +425,9 @@ public class HttpUtils {
 	 * @param <T>
 	 *            监听泛型
 	 * @throws IOException 
-	 * @throws WebException 
+	 * @throws CommonException 
 	 */
-	public static <T> List<T> doPost(  String urlString, Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doPost(  String urlString, Object params,  Class<T> cls,Map<String,String> headers) throws CommonException {
 		return doGeneralPost(urlString, "POST", params, cls, headers);
 	}
 	
@@ -441,7 +454,7 @@ public class HttpUtils {
 					if (listener != null) {
 						listener.onFinish(result);
 					}
-				} catch (WebException | IOException e) {
+				} catch (CommonException e) {
 					if (listener != null) {
 						// 回调onError()方法
 						listener.onError(e);
@@ -463,9 +476,9 @@ public class HttpUtils {
 	 * @param params
 	 *            参数列表,Map对象为form提交,Object/Array为json提交,剩下对象直接提交
 	 * @throws IOException 
-	 * @throws WebException 
+	 * @throws CommonException 
 	 */
-	public static String doGeneralPost(String urlString,String method , Object params,Map<String,String> headers) throws WebException, IOException {
+	public static String doGeneralPost(String urlString,String method , Object params,Map<String,String> headers) throws CommonException {
 		return doConnectionPost(urlString,method, params,headers);
 	}
 
@@ -525,11 +538,11 @@ public class HttpUtils {
 										listener.onFinish( (List<T>)mapper.readValue(result, collectionType));
 									}
 								} else {
-									listener.onError(new WebException("Getting information is not in JSON format:" + result));
+									listener.onError(new CommonException("Getting information is not in JSON format:" + result));
 								}
 							}
 
-						} catch (WebException | IOException e) {
+						} catch (CommonException | IOException e) {
 							if (listener != null) {
 								// 回调onError()方法
 								listener.onError(e);
@@ -555,10 +568,10 @@ public class HttpUtils {
 	 * @param <T>
 	 *            监听泛型
 	 * @throws IOException 
-	 * @throws WebException 
+	 * @throws CommonException 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> List<T> doGeneralPost(  String urlString,String method , Object params,  Class<T> cls,Map<String,String> headers) throws WebException, IOException {
+	public static <T> List<T> doGeneralPost(  String urlString,String method , Object params,  Class<T> cls,Map<String,String> headers) throws CommonException {
 		String result = doConnectionPost(urlString,method, params,headers);
 		if(!Utils.isEmpty(result)) {
 			Field httpformatJosnField = ReflectionUtils.findField(cls, ResponseFormatKey);
@@ -582,12 +595,20 @@ public class HttpUtils {
 			}
 			
 			if ( result.startsWith("{")) {
-				return  Lists.newArrayList(mapper.readValue(result, cls));
+				try {
+					return  Lists.newArrayList(mapper.readValue(result, cls));
+				} catch (IOException e) {
+					throw CommonException.parseException(e);
+				}
 			}else if ( result.startsWith("[")) {
-					JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
-					return  (List<T>)mapper.readValue(result, collectionType);
+					try {
+						JavaType collectionType = mapper.getTypeFactory().constructParametricType(List.class, cls);
+						return  (List<T>)mapper.readValue(result, collectionType);
+					} catch (IOException e) {
+						throw CommonException.parseException(e);
+					}
 			} else {
-				throw new WebException("Getting information is not in JSON format:" + result);
+				throw new CommonException("Getting information is not in JSON format:" + result);
 			}
 			
 		}
@@ -609,10 +630,10 @@ public class HttpUtils {
 	 *            参数列表,Map对象为form提交,Object/Array为json提交,剩下对象直接提交
 	 * @param headers
 	 * @throws IOException 
-	 * @throws WebException 
+	 * @throws CommonException 
 	 */
 	@SuppressWarnings("rawtypes")
-	private static String doConnectionPost(String urlString, String method ,Object params,Map<String,String> headers) throws WebException, IOException {
+	private static String doConnectionPost(String urlString, String method ,Object params,Map<String,String> headers) throws CommonException {
 
 		URL url;
 		HttpURLConnection httpURLConnection = null;
@@ -688,21 +709,26 @@ public class HttpUtils {
 				}
 				return buffer.toString();
 			} else {
-				throw new WebException("response err code:" + httpURLConnection.getResponseCode());
+				throw new CommonException("response err code:" + httpURLConnection.getResponseCode());
 			}
+		}catch(Exception e) {
+			throw CommonException.parseException(e);
 		} finally {
-			if(printWriter != null ){
-				printWriter.close();
-			}
-			if( is != null){
-				is.close();
-			}
-			if( bf != null){
-				bf.close();
-			}
-			if (httpURLConnection != null) {
-				// 最后记得关闭连接
-				httpURLConnection.disconnect();
+			try {
+				if(printWriter != null ){
+					printWriter.close();
+				}
+				if( is != null){
+					is.close();
+				}
+				if( bf != null){
+					bf.close();
+				}
+				if (httpURLConnection != null) {
+					// 最后记得关闭连接
+					httpURLConnection.disconnect();
+				}
+			} catch (IOException e) {
 			}
 		}
 	}

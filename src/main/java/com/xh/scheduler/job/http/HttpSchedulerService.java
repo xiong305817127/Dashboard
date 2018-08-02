@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Maps;
-import com.xh.common.exception.WebException;
+import com.xh.common.CommonException;
 import com.xh.scheduler.job.JobService;
 import com.xh.scheduler.job.http.vo.DeviceResponse;
 import com.xh.util.http.HttpUtils;
@@ -28,7 +28,7 @@ public class HttpSchedulerService extends JobService{
 	 * @return
 	 * @throws CommonException
 	 */
-	public Integer saveDeviceResponse(List<DeviceResponse> devices) throws WebException {
+	public Integer saveDeviceResponse(List<DeviceResponse> devices) throws CommonException {
 		if(devices!=null && devices.size()>0) {
 			//TODO do something
 		}
@@ -52,7 +52,8 @@ public class HttpSchedulerService extends JobService{
 	 * @throws CommonException
 	 * @throws IOException
 	 */
-	public  Map<String,String> getSenzflowHeader(Map headerParams) throws WebException, IOException {
+	@SuppressWarnings("rawtypes")
+	public  Map<String,String> getSenzflowHeader(Map headerParams) throws CommonException, IOException {
 		
 		if(StringUtils.isEmpty(AccessToken) || TokenExpiresIn < new Date().getTime() ) {
 			//更新token
@@ -74,7 +75,7 @@ public class HttpSchedulerService extends JobService{
 		}
 		
 		if(StringUtils.isEmpty(AccessToken)) {
-			throw new WebException(" 401 ,token获取失败！");
+			throw new CommonException(" 401 ,token获取失败！");
 		}
 		
 		HashMap<String, String> headers = Maps.newHashMap() ;

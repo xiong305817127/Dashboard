@@ -2,9 +2,11 @@ package com.xh.service.menu;
 
 import java.util.HashMap;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
-import com.xh.common.exception.WebException;
-import com.xh.entry.Menu;
+import com.xh.common.CommonException;
+import com.xh.dto.MenuDto;
+import com.xh.service.common.ServiceException;
 import com.xh.util.ConfigPropertyUtil;
 import com.xh.util.Utils;
 import com.xh.util.vfs.WebVFS;
@@ -16,15 +18,15 @@ public class MenuCreateFile {
 	private static final String routeReplaceNote = "//dynamic add Route,Do not delete";
 	private static final String apiReplaceNote = "//dynamic add Api,Do not delete";
 
-	public static void createFile(Menu menu) throws Exception {
+	public static void createFile(MenuDto menu) throws CommonException {
 
 		if (menu == null ) {
-			throw new WebException(" menu is null! ");
+			throw new ServiceException(" menu is null! ");
 		}
 		
 		String projectRoot = ConfigPropertyUtil.getProperty("project.source.path.root");
 		if ( Utils.isEmpty(projectRoot)) {
-			throw new WebException("The project root path (Dashboard path) was not found. Configure the variable 'project.source.path.root' ! ");
+			throw new ServiceException("The project root path (Dashboard path) was not found. Configure the variable 'project.source.path.root' ! ");
 		}
 
 		new MenuCreateFile(projectRoot, menu.getRoute(), menu.getName()).start();
@@ -40,7 +42,7 @@ public class MenuCreateFile {
 		this.menuName = menuName;
 	}
 
-	public void start() throws Exception {
+	public void start() throws CommonException {
 		// 1.创建 routes
 		createRouteFile();
 		// 2.创建 models
@@ -53,7 +55,7 @@ public class MenuCreateFile {
 		replaceRouter();
 	}
 
-	private void createRouteFile() throws Exception {
+	private void createRouteFile() throws CommonException {
 		String templateFilePath = projectRoot + templateRoot + "routes/";
 		String targetFilePath = projectRoot + targetRoot + "routes/" + menuName + "/";
 		WebVFS.createFolder(targetFilePath);
@@ -61,47 +63,51 @@ public class MenuCreateFile {
 
 	}
 
-	private void createModelsFile() throws Exception {
+	private void createModelsFile() throws CommonException {
 		String templateFilePath = projectRoot + templateRoot + "models.js";
 		String targetFilePath = projectRoot + targetRoot + "models/" + menuName + ".js";
 		templateReplace(templateFilePath, targetFilePath);
 
 	}
 
-	private void createServicesFile() throws Exception {
+	private void createServicesFile() throws CommonException {
 		String templateFilePath = projectRoot + templateRoot + "services.js";
 		String targetFilePath = projectRoot + targetRoot + "services/" + menuName + ".js";
 		templateReplace(templateFilePath, targetFilePath);
 
 	}
 
-	private void templateReplace(String templateFile, String targetFile) throws Exception {
+	private void templateReplace(String templateFile, String targetFile) throws CommonException {
 
-		FileObject templateFileObj = WebVFS.getFileObject(templateFile);
-		if (templateFileObj.isFile()) {
-			if ( !WebVFS.fileExists(targetFile) ) {
-				templateFileObj.close();
-				String fileContent = WebVFS.getTextFileContent(templateFile, "utf-8");
-				if (!Utils.isEmpty(fileContent)) {
-					HashMap<String, String> map = Utils.newHashMap();
-					map.put("MenuRoute", menuRoute);
-					map.put("MenuName", menuName);
-					String newContent = Utils.replMap(fileContent, map);
-					WebVFS.writerTextFileContent(targetFile, newContent, "utf-8");
+		try {
+			FileObject templateFileObj = WebVFS.getFileObject(templateFile);
+			if (templateFileObj.isFile()) {
+				if ( !WebVFS.fileExists(targetFile) ) {
+					templateFileObj.close();
+					String fileContent = WebVFS.getTextFileContent(templateFile, "utf-8");
+					if (!Utils.isEmpty(fileContent)) {
+						HashMap<String, String> map = Utils.newHashMap();
+						map.put("MenuRoute", menuRoute);
+						map.put("MenuName", menuName);
+						String newContent = Utils.replMap(fileContent, map);
+						WebVFS.writerTextFileContent(targetFile, newContent, "utf-8");
+					}
+				}
+
+			} else {
+				for (FileObject child : templateFileObj.getChildren()) {
+					String fileName = child.getName().getBaseName();
+					templateReplace(templateFile + fileName, targetFile + fileName);
+					child.close();
 				}
 			}
-
-		} else {
-			for (FileObject child : templateFileObj.getChildren()) {
-				String fileName = child.getName().getBaseName();
-				templateReplace(templateFile + fileName, targetFile + fileName);
-				child.close();
-			}
+		} catch (FileSystemException e) {
+			throw CommonException.parseException(e);
 		}
 
 	}
 
-	private synchronized void replaceConfigApi() throws Exception {
+	private synchronized void replaceConfigApi() throws CommonException {
 
 		String targetFilePath = projectRoot + targetRoot + "utils/config.js";
 		String fileContent = WebVFS.getTextFileContent(targetFilePath, "utf-8");
@@ -112,7 +118,7 @@ public class MenuCreateFile {
 		}
 	}
 
-	private synchronized void replaceRouter() throws Exception {
+	private synchronized void replaceRouter() throws CommonException {
 
 		String targetFilePath = projectRoot + targetRoot + "router.js";
 		String fileContent = WebVFS.getTextFileContent(targetFilePath, "utf-8");
