@@ -1,13 +1,11 @@
 package com.xh.service.common;
 
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xh.util.ReflectUtils;
-import com.xh.util.Utils;
 
 public class BaseService {
 
@@ -19,17 +17,27 @@ public class BaseService {
 	 * @param bean
 	 * @return
 	 */
-	protected Object updateObjectToBean(Object obj,Object bean){
-		
-		List<String> beanFields = ReflectUtils.seekOsgiFieldList(bean, true).stream().map(field -> { return field.getName();}).collect(Collectors.toList());;
-		ReflectUtils.seekOsgiFieldList(obj, true).stream().filter( field -> { return beanFields.contains(field.getName());}).forEach( field -> {
-			Object fieldValue = ReflectUtils.getOsgiField(obj, field.getName(), true);
-			if(!Utils.isNull(fieldValue)){
-				ReflectUtils.setOsgiField(bean, field.getName(), fieldValue, true);
+	protected Object updateObjectToBean(Object source,Object bean){
+		if (source == null || bean ==  null ) {
+			return bean;
+		}
+		if(bean instanceof Class) {
+			bean = ReflectUtils.newOsgiInstance(bean, null, null,null);
+		}
+
+		List<String> fields = ReflectUtils.getOsgiFieldNames(source);
+		if(fields != null && fields.size() >0) {
+			for(String fieldName : fields) {
+				Object sourceFieldVlaue = ReflectUtils.getOsgiField(source, fieldName, true);
+				if(sourceFieldVlaue != null ) {
+					Field beanField = ReflectUtils.seekOsgiField(bean.getClass(), fieldName, true);
+					if( beanField != null && ReflectUtils.isSameClass(beanField.getType(), sourceFieldVlaue.getClass()) ) {
+						ReflectUtils.setOsgiField(bean, fieldName, sourceFieldVlaue, true);
+					}
+				}
 			}
-		});
-		
-		return bean;
+		}
+		return bean;      
 	}
 
 }

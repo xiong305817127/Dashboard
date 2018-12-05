@@ -120,11 +120,11 @@ public class CloudLoggerFactory {
 		AppenderRef[] refs = new AppenderRef[]{ref};
 
 		// Create new logger
-		String level = ConfigPropertyUtil.getProperty("idatrix.logger.level", "INFO").toUpperCase();
+		String level = ConfigPropertyUtil.getProperty("cloud.logger.level", "INFO").toUpperCase();
 		//是否级联输出到父appender
-		boolean additivity = Boolean.valueOf(ConfigPropertyUtil.getProperty("idatrix.logger.additivity", "false"));
+		boolean additivity = Boolean.valueOf(ConfigPropertyUtil.getProperty("cloud.logger.additivity", "false"));
 		//当设置不输出到父appender时,错误等级的日志是否输出到父appender
-		boolean additivityError = Boolean.valueOf(ConfigPropertyUtil.getProperty("idatrix.logger.additivity.error", "true"));
+		boolean additivityError = Boolean.valueOf(ConfigPropertyUtil.getProperty("cloud.logger.additivity.error", "true"));
 		if(!additivity && additivityError ) {
 			additivity=true;
 			LoggerConfig root = config.getLoggerConfig("ROOT");

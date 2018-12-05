@@ -25,6 +25,7 @@
 	
 	<mvc:resources mapping="/swagger/**" location="/swagger/" />
 	<mvc:resources mapping="/*" location="/frontend/" />
+	<!-- <mvc:view-controller path="/" view-name="redirect:/index.html" />	 -->
 	
 	<mvc:cors>
     	<mvc:mapping path="/**" />

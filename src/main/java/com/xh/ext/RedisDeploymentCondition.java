@@ -28,24 +28,3 @@ public class RedisDeploymentCondition implements Condition {
 	}
 
 }
-
-
-//@PropertySource("file:./config/idatrix.properties")
-//class RedisNonDeploymentCondition implements Condition {
-//	
-//	/*
-//	 * @see org.springframework.context.annotation.Condition#matches(org.springframework.context.annotation.ConditionContext, org.springframework.core.type.AnnotatedTypeMetadata)
-//	 */
-//	@Override
-//	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-//		String ddProperty = IdatrixPropertyUtil.getProperty("idatrix.redis.cache.enable", "false");
-//		
-//		if (!"true".equalsIgnoreCase(ddProperty)) {
-//    		return true;
-//    	} else {
-//    		// No dubbo to be configured!
-//    		return false;
-//    	}
-//	}
-//
-//}
